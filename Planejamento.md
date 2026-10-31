@@ -1,4 +1,4 @@
-# Planejamento de Engenharia e Distribuição de Tarefas (4 Devs) — Mexa-se: Calistenia de Quebrada
+# Planejamento de Engenharia e Distribuição de Tarefas (4 Devs) — FitZero
 
 ## 1. Visão Geral e Restrições Não-Negociáveis
 
@@ -40,7 +40,7 @@
 * **Responsável:** Dev 1 | **Pontos:** 5 | **Prioridade:** P0 (Bloqueante)
 * **Descrição:** Desenvolver `sw.js` com interceptação de requisições e armazenamento em cache de todos os arquivos estáticos da aplicação.
 * **Critérios de Aceite:**
-  * Evento `install`: executa pré-cache completo dos assets essenciais (`index.html`, `styles.css`, `app.js`, `exercises.json`, SVGs) via `caches.open('mexase-v1')`.
+  * Evento `install`: executa pré-cache completo dos assets essenciais (`index.html`, `styles.css`, `app.js`, `exercises.json`, SVGs) via `caches.open('fitzero-v1')`.
   * Evento `activate`: faz o expurgo e limpeza automática de versões legadas de cache.
   * Evento `fetch`: responde via estratégia *Cache-First* imediata; se falhar, tenta rede e retorna fallback offline amigável.
   * Aplicação continua funcionando integralmente com o navegador em modo offline simulado.
