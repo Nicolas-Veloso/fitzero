@@ -1,56 +1,156 @@
 /**
  * @file styles.css
- * @description Sistema de Design Obsidian/Black & App Shell — FitZero
- * Estética minimalista de alta precisão, zero frameworks e contraste WCAG AA+
+ * @description Arquitetura CSS Puro, Design Tokens, App Shell Mobile-First,
+ * Modo Escuro Nativo, Alto Contraste Solar (WCAG AA/AAA) e Componentes UI — FitZero.
+ * Responsável: Dev 2 (Frontend UI/UX & Acessibilidade) — [UI-01, UI-02, UI-03]
  */
 
 :root {
-  /* Paleta Pure Black / Stealth Carbon */
+  /* 1. Design Tokens: Cores Semânticas ([UI-01]) — Contraste WCAG AA+ (>= 6.8:1) */
   --bg-primary: #050505;
-  --bg-subtle: #090909;
-  --surface: #0e0e0e;
-  --surface-elevated: #161616;
-  --surface-hover: #1f1f1f;
+  --bg-subtle: #0a0a0c;
+  --surface: #111114;
+  --surface-elevated: #1a1a1f;
+  --surface-hover: #24242b;
 
-  --text-primary: #f5f5f7;
-  --text-secondary: #8e8e93;
-  --text-muted: #525256;
+  --text-primary: #f5f5f7;     /* ~18.5:1 sobre --bg-primary */
+  --text-secondary: #c2c2ca;   /* ~11.2:1 sobre --bg-primary */
+  --text-muted: #9a9aa4;       /* ~6.9:1 sobre --bg-primary ( > 4.5:1 WCAG AA ) */
 
-  /* Destaque cinético (Volt) + alias de compatibilidade com contrato UI-01 */
+  /* Destaque Semântico & Cinético ([UI-01]) */
+  --accent-teal: #00e5b0;
   --accent: #d4ff00;
   --accent-hover: #e2ff4d;
   --accent-ink: #050505;
-  --accent-teal: #d4ff00;
 
   --danger: #ff453a;
   --warning: #ffd60a;
   --success: #32d74b;
 
-  --border-color: #1f1f1f;
-  --border-strong: #2c2c2e;
+  --border-color: #242429;
+  --border-strong: #383840;
+  --backdrop-overlay: rgba(0, 0, 0, 0.78);
+  --header-bg: rgba(5, 5, 5, 0.88);
+  --nav-bg: rgba(8, 8, 10, 0.94);
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  /* 2. Design Tokens: Espaçamentos ([UI-01]) */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.25rem;
+  --space-xl: 1.75rem;
+  --space-2xl: 2.5rem;
 
-  --header-height: 60px;
-  --bottom-nav-height: 68px;
+  /* 3. Design Tokens: Tipografia Fluida ([UI-01]) */
   --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --text-xs: clamp(0.7rem, 0.66rem + 0.2vw, 0.76rem);
+  --text-sm: clamp(0.82rem, 0.78rem + 0.22vw, 0.9rem);
+  --text-base: clamp(0.92rem, 0.88rem + 0.25vw, 1rem);
+  --text-lg: clamp(1.06rem, 1rem + 0.35vw, 1.2rem);
+  --text-xl: clamp(1.45rem, 1.3rem + 0.7vw, 1.75rem);
+
+  /* 4. Raios, Dimensões e Alvos de Toque ([UI-02]) */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --touch-target-min: 48px;
+  --header-height: 64px;
+  --bottom-nav-height: 72px;
 }
 
+/* Suporte Nativo a Tema Claro quando o sistema operacional solicita light mode */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #f4f5f7;
+    --bg-subtle: #ebedf0;
+    --surface: #ffffff;
+    --surface-elevated: #f0f2f5;
+    --surface-hover: #e4e7ec;
+
+    --text-primary: #0b0c0e;     /* ~19.1:1 sobre #ffffff */
+    --text-secondary: #2d3139;   /* ~12.4:1 sobre #ffffff */
+    --text-muted: #4f5663;       /* ~7.2:1 sobre #ffffff ( > 4.5:1 WCAG AA ) */
+
+    --accent-teal: #006b54;
+    --accent: #0f766e;
+    --accent-hover: #115e59;
+    --accent-ink: #ffffff;
+
+    --danger: #c81e1e;
+    --warning: #b45309;
+    --success: #15803d;
+
+    --border-color: #d0d5dd;
+    --border-strong: #98a2b3;
+    --backdrop-overlay: rgba(11, 12, 14, 0.65);
+    --header-bg: rgba(244, 245, 247, 0.92);
+    --nav-bg: rgba(255, 255, 255, 0.96);
+  }
+}
+
+/* Suporte Nativo Explícito ao Modo Escuro ([UI-01]: @media (prefers-color-scheme: dark)) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #050505;
+    --bg-subtle: #0a0a0c;
+    --surface: #111114;
+    --surface-elevated: #1a1a1f;
+    --surface-hover: #24242b;
+
+    --text-primary: #f5f5f7;
+    --text-secondary: #c2c2ca;
+    --text-muted: #9a9aa4;
+
+    --accent-teal: #00e5b0;
+    --accent: #d4ff00;
+    --accent-hover: #e2ff4d;
+    --accent-ink: #050505;
+
+    --danger: #ff453a;
+    --warning: #ffd60a;
+    --success: #32d74b;
+
+    --border-color: #242429;
+    --border-strong: #383840;
+    --backdrop-overlay: rgba(0, 0, 0, 0.78);
+    --header-bg: rgba(5, 5, 5, 0.88);
+    --nav-bg: rgba(8, 8, 10, 0.94);
+  }
+}
+
+/* Modo de Alto Contraste para Leitura Externa sob Sol Forte ([UI-01]: .high-contrast) */
 body.high-contrast {
   --bg-primary: #000000;
   --bg-subtle: #000000;
-  --surface: #0a0a0a;
-  --surface-elevated: #141414;
+  --surface: #050505;
+  --surface-elevated: #121212;
+  --surface-hover: #1f1f1f;
   --text-primary: #ffffff;
-  --text-secondary: #e5e5e5;
-  --text-muted: #b3b3b3;
+  --text-secondary: #f2f2f2;
+  --text-muted: #dedede;
   --accent: #ffff00;
-  --accent-teal: #ffff00;
+  --accent-hover: #ffff66;
+  --accent-ink: #000000;
+  --accent-teal: #00ffcc;
+  --danger: #ff6b6b;
+  --warning: #ffea00;
+  --success: #00ff66;
   --border-color: #ffffff;
   --border-strong: #ffffff;
+  --header-bg: #000000;
+  --nav-bg: #000000;
+  background-image: none !important;
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --border-color: #e5e5e5;
+    --border-strong: #ffffff;
+    --text-secondary: #ffffff;
+    --text-muted: #e0e0e0;
+  }
 }
 
 *,
@@ -66,32 +166,61 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-sans);
+  font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-variant-numeric: tabular-nums;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   min-height: 100vh;
-  background-image: radial-gradient(circle at 50% 0%, #141414 0%, #050505 65%);
-  background-attachment: fixed;
+  min-height: 100dvh;
   padding-top: var(--header-height);
-  padding-bottom: calc(var(--bottom-nav-height) + 2rem);
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + var(--space-xl));
+}
+
+body.drawer-open {
+  overflow: hidden;
+}
+
+/* Acessibilidade de Teclado (WCAG 2.4.7 Focus Visible) */
+:focus-visible {
+  outline: 2px solid var(--accent-teal);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: var(--space-md);
+  z-index: 999;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+
+.skip-link:focus {
+  top: var(--space-xs);
 }
 
 .hidden {
   display: none !important;
 }
 
-/* Cabeçalho Superior Translúcido */
+/* Cabeçalho Superior Fixo Leve ([UI-02]) */
 .app-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: var(--header-height);
-  background: rgba(5, 5, 5, 0.86);
+  background: var(--header-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-color);
@@ -102,7 +231,7 @@ body {
   max-width: 680px;
   height: 100%;
   margin: 0 auto;
-  padding: 0 1.15rem;
+  padding: 0 var(--space-lg);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -115,9 +244,9 @@ body {
 }
 
 .brand-mark {
-  width: 30px;
-  height: 30px;
-  border-radius: 7px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   border: 1px solid var(--border-strong);
   display: block;
 }
@@ -129,7 +258,7 @@ body {
 }
 
 .brand-title {
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   text-transform: uppercase;
@@ -143,16 +272,16 @@ body {
 
 .brand-edition {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: var(--text-xs);
   color: var(--text-muted);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
 }
 
 /* Indicador Minimalista de Rede/Cache */
@@ -160,12 +289,12 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  height: 28px;
-  padding: 0 0.65rem;
+  min-height: 32px;
+  padding: 0 0.7rem;
   border-radius: 999px;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 600;
+  font-size: var(--text-xs);
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   border: 1px solid var(--border-color);
@@ -174,19 +303,19 @@ body {
 }
 
 .status-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background-color: var(--text-secondary);
 }
 
 .status-badge.online .status-dot {
-  background-color: var(--accent);
-  box-shadow: 0 0 8px rgba(212, 255, 0, 0.6);
+  background-color: var(--accent-teal);
+  box-shadow: 0 0 8px var(--accent-teal);
 }
 
 .status-badge.offline {
-  border-color: rgba(255, 214, 10, 0.35);
+  border-color: var(--warning);
   color: var(--warning);
 }
 
@@ -194,14 +323,15 @@ body {
   background-color: var(--warning);
 }
 
-/* Botões e Alvos de Toque (mínimo 48x48px em mobile) */
+/* Botões e Alvos de Toque ([UI-02]: Mínimo 48x48px) */
 .btn {
-  min-height: 48px;
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
   padding: 0.65rem 1.1rem;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   font-family: inherit;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   letter-spacing: -0.01em;
   cursor: pointer;
@@ -211,11 +341,12 @@ body {
   gap: 0.5rem;
   transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
   user-select: none;
+  text-decoration: none;
 }
 
 .btn svg {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
   stroke: currentColor;
   stroke-width: 2;
   fill: none;
@@ -248,18 +379,18 @@ body {
 .btn-danger {
   background-color: transparent;
   color: var(--danger);
-  border-color: rgba(255, 69, 58, 0.35);
+  border-color: var(--danger);
 }
 
 .btn-danger:hover {
-  background-color: rgba(255, 69, 58, 0.08);
+  background-color: rgba(255, 69, 58, 0.12);
 }
 
 .btn-icon-only {
-  width: 38px;
-  height: 38px;
-  min-height: 38px;
-  min-width: 38px;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
   padding: 0;
   border-radius: var(--radius-sm);
   background-color: var(--surface);
@@ -270,41 +401,42 @@ body {
 .btn-icon-only:hover,
 .btn-icon-only[aria-pressed="true"] {
   color: var(--accent);
-  border-color: var(--border-strong);
+  border-color: var(--accent);
 }
 
 /* Container Principal */
 .app-main {
   max-width: 680px;
   margin: 0 auto;
-  padding: 1.25rem 1.15rem;
+  padding: var(--space-lg);
 }
 
 /* Cabeçalho de Seção (Hero) */
 .section-hero {
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-lg);
 }
 
 .section-eyebrow {
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 600;
+  font-size: var(--text-xs);
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--accent);
-  margin-bottom: 0.3rem;
+  color: var(--accent-teal);
+  margin-bottom: 0.25rem;
 }
 
 .section-title-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
 }
 
 .section-title {
-  font-size: 1.55rem;
+  font-size: var(--text-xl);
   font-weight: 800;
   letter-spacing: -0.035em;
   margin: 0;
@@ -312,7 +444,8 @@ body {
 
 .section-summary {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
+  font-weight: 600;
   color: var(--text-secondary);
 }
 
@@ -321,87 +454,172 @@ body {
   background-color: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  padding: 1rem 1.15rem;
-  margin-bottom: 1.25rem;
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-lg);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.85rem;
+  gap: var(--space-sm);
 }
 
 .install-banner-text strong {
   display: block;
-  font-size: 0.92rem;
-  letter-spacing: -0.01em;
+  font-size: var(--text-base);
 }
 
 .install-banner-text span {
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   color: var(--text-secondary);
 }
 
-/* Seletor Segmentado de Ambiente */
+/* Toggle de Seleção de Ambiente ([UI-03]: Quarto / Laje vs. Praça / Barras) */
+.env-selector-wrap {
+  margin-bottom: var(--space-md);
+}
+
 .env-filter {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.35rem;
+  gap: 0.4rem;
   background-color: var(--surface);
-  padding: 0.3rem;
+  padding: 0.35rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
-  margin-bottom: 1.25rem;
 }
 
 .env-btn {
-  min-height: 46px;
+  min-height: 56px;
+  min-width: var(--touch-target-min);
+  padding: 0.5rem 0.75rem;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--text-secondary);
   font-family: inherit;
-  font-weight: 700;
-  font-size: 0.84rem;
-  letter-spacing: -0.01em;
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.15s ease;
+  justify-content: flex-start;
+  gap: 0.65rem;
+  text-align: left;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .env-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   stroke: currentColor;
   stroke-width: 2;
   fill: none;
+  flex-shrink: 0;
+}
+
+.env-btn-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.env-btn-title {
+  font-weight: 800;
+  font-size: var(--text-sm);
+  color: inherit;
+}
+
+.env-btn-sub {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: 0.1rem;
 }
 
 .env-btn.active {
   background-color: var(--surface-elevated);
   color: var(--text-primary);
-  border-color: var(--border-strong);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  border-color: var(--accent);
+}
+
+.env-btn.active .env-btn-sub {
+  color: var(--text-secondary);
 }
 
 .env-btn.active svg {
   stroke: var(--accent);
 }
 
-/* Grid de Cards e Estrutura de Exercício */
+.env-context-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: var(--space-xs);
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.env-context-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-teal);
+  flex-shrink: 0;
+}
+
+/* Barra de Chips de Foco Muscular ([UI-03]) */
+.focus-filter-bar {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  margin-bottom: var(--space-lg);
+  scrollbar-width: none;
+}
+
+.focus-filter-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.focus-chip {
+  min-height: var(--touch-target-min);
+  padding: 0 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background-color: var(--surface);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.focus-chip:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.focus-chip.active {
+  background-color: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+
+/* Grid de Cards e Estrutura de Exercício ([UI-03]) */
 .card-grid {
   display: grid;
-  gap: 0.85rem;
+  gap: var(--space-md);
 }
 
 .card {
   background-color: var(--surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
-  transition: border-color 0.15s ease;
+  padding: var(--space-lg);
+  transition: border-color 0.15s ease, transform 0.15s ease;
 }
 
 .card:hover {
@@ -412,40 +630,48 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.85rem;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
 }
 
 .card-index-group {
   display: flex;
   align-items: baseline;
-  gap: 0.65rem;
+  gap: 0.6rem;
 }
 
 .card-index {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 800;
   color: var(--accent);
 }
 
 .card-title {
   margin: 0;
-  font-size: 1.08rem;
-  font-weight: 700;
+  font-size: var(--text-lg);
+  font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-primary);
+}
+
+.card-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: var(--space-md);
 }
 
 .tag {
   display: inline-flex;
   align-items: center;
+  gap: 0.3rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  padding: 0.25rem 0.55rem;
+  padding: 0.28rem 0.6rem;
   border-radius: var(--radius-sm);
   background-color: var(--surface-elevated);
   border: 1px solid var(--border-color);
@@ -455,16 +681,57 @@ body {
 
 .tag-accent {
   color: var(--accent);
-  border-color: rgba(212, 255, 0, 0.25);
-  background-color: rgba(212, 255, 0, 0.06);
+  border-color: var(--accent);
+}
+
+.tag-teal {
+  color: var(--accent-teal);
+  border-color: var(--accent-teal);
+}
+
+/* Mini Preview Ilustrado + Métricas no Card ([UI-03]) */
+.card-visual-row {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: var(--space-sm);
+  align-items: stretch;
+  margin-bottom: var(--space-md);
+}
+
+.card-thumb-btn {
+  min-height: 84px;
+  min-width: 84px;
+  padding: 0.35rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-subtle);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.card-thumb-btn:hover {
+  border-color: var(--accent-teal);
+  background-color: var(--surface-elevated);
+}
+
+.card-thumb-btn svg {
+  width: 100%;
+  height: 70px;
 }
 
 /* Faixa de Métricas do Exercício */
 .specs-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  margin-bottom: 0.85rem;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.card-visual-row .specs-grid {
+  margin-bottom: 0;
 }
 
 .spec-box {
@@ -472,12 +739,16 @@ body {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .spec-label {
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: 0.66rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);
@@ -485,70 +756,16 @@ body {
 }
 
 .spec-value {
-  font-size: 0.84rem;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: 700;
   color: var(--text-primary);
 }
 
-/* Gaveta de Técnica e Postura (Progressive Disclosure) */
-.tech-guide {
-  background-color: var(--bg-subtle);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  margin-bottom: 0.9rem;
-  overflow: hidden;
-}
-
-.tech-guide summary {
-  padding: 0.7rem 0.85rem;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  cursor: pointer;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  user-select: none;
-}
-
-.tech-guide summary::-webkit-details-marker {
-  display: none;
-}
-
-.tech-guide summary::after {
-  content: "+";
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  color: var(--text-muted);
-}
-
-.tech-guide[open] summary {
-  border-bottom: 1px solid var(--border-color);
-  color: var(--text-primary);
-}
-
-.tech-guide[open] summary::after {
-  content: "−";
-  color: var(--accent);
-}
-
-.tech-guide-body {
-  padding: 0.85rem;
+/* Ações do Card de Exercício ([UI-03]) */
+.card-actions {
   display: grid;
-  gap: 0.7rem;
-  font-size: 0.84rem;
-  color: var(--text-secondary);
-}
-
-.tech-item strong {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-primary);
-  margin-bottom: 0.2rem;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xs);
 }
 
 .btn-block {
@@ -558,22 +775,329 @@ body {
 .btn-done {
   background-color: var(--surface-elevated) !important;
   color: var(--accent) !important;
-  border-color: rgba(212, 255, 0, 0.4) !important;
+  border-color: var(--accent) !important;
+}
+
+/* Gaveta Lateral / Modal Leve com Detalhes e Vetor Anatômico ([UI-03]) */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background-color: var(--backdrop-overlay);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  animation: fadeInBackdrop 0.18s ease-out;
+}
+
+.exercise-drawer {
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  max-height: 90dvh;
+  background-color: var(--surface);
+  border-top: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.6);
+  animation: slideUpDrawer 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 640px) {
+  .drawer-backdrop {
+    justify-content: flex-end;
+    align-items: stretch;
+  }
+
+  .exercise-drawer {
+    max-width: 460px;
+    max-height: 100vh;
+    max-height: 100dvh;
+    height: 100%;
+    border-top: none;
+    border-left: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+    animation: slideLeftDrawer 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .drawer-handle {
+    display: none;
+  }
+}
+
+.drawer-handle {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background-color: var(--border-strong);
+  margin: 0.65rem auto 0.2rem;
+  flex-shrink: 0;
+}
+
+.drawer-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.drawer-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.45rem;
+}
+
+.drawer-title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.drawer-body {
+  padding: var(--space-lg);
+  overflow-y: auto;
+  display: grid;
+  gap: var(--space-md);
+}
+
+.drawer-footer {
+  padding: var(--space-md) var(--space-lg) calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border-color);
+  background-color: var(--surface);
+}
+
+/* Palco de Ilustração Anatômica SVG ([UI-03], [CONT-02], [CONT-03]) */
+.anatomy-stage {
+  margin: 0;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.anatomy-svg-box {
+  width: 100%;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.anatomy-svg-box svg {
+  width: 100%;
+  max-width: 300px;
+  height: 100%;
+}
+
+.anatomy-stage-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-md);
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--border-color);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.anatomy-stage-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dot-muscle,
+.dot-spine,
+.dot-anchor {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot-muscle {
+  background-color: var(--accent);
+}
+
+.dot-spine {
+  background-color: var(--accent-teal);
+}
+
+.dot-anchor {
+  background-color: var(--warning);
+}
+
+/* Microanimações CSS Leves para Vetores Anatômicos ([CONT-03]) */
+.svg-muscle-highlight {
+  animation: pulseMuscle 2.4s ease-in-out infinite;
+}
+
+.svg-force-arrow {
+  stroke-dasharray: 5 4;
+  animation: forceFlow 1.8s linear infinite;
+}
+
+@keyframes pulseMuscle {
+  0%, 100% {
+    opacity: 0.72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes forceFlow {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
+@keyframes fadeInBackdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUpDrawer {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes slideLeftDrawer {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svg-muscle-highlight,
+  .svg-force-arrow,
+  .drawer-backdrop,
+  .exercise-drawer {
+    animation: none !important;
+  }
+}
+
+/* Blocos de Orientação Biomecânica no Drawer */
+.drawer-guidance-list {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.guidance-card {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.guidance-safe {
+  border-left: 3px solid var(--accent-teal);
+}
+
+.guidance-posture {
+  border-left: 3px solid var(--accent);
+}
+
+.guidance-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.35rem;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.guidance-header svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--accent-teal);
+  stroke-width: 2;
+  fill: none;
+  flex-shrink: 0;
+}
+
+.guidance-posture .guidance-header svg {
+  stroke: var(--accent);
+}
+
+.guidance-card p {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* Legenda na Aba Postura Segura */
+.anatomy-legend {
+  display: grid;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.legend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+}
+
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  margin-top: 0.25rem;
+  flex-shrink: 0;
+}
+
+.swatch-muscle {
+  background-color: var(--accent);
+}
+
+.swatch-spine {
+  background-color: var(--accent-teal);
+}
+
+.swatch-anchor {
+  background-color: var(--warning);
+}
+
+.legend-item strong {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.legend-item span {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
 }
 
 /* Estatísticas do Histórico */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.65rem;
-  margin-bottom: 1.15rem;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
 }
 
 .stat-card {
   background-color: var(--surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 1rem 0.75rem;
+  padding: var(--space-md) var(--space-sm);
 }
 
 .stat-value {
@@ -588,33 +1112,35 @@ body {
 
 .stat-label {
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: var(--text-xs);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   color: var(--text-secondary);
 }
 
 .card-meta {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--text-secondary);
-  margin: 0.35rem 0 0.85rem;
+  margin: 0.35rem 0 var(--space-md);
   line-height: 1.55;
 }
 
 .lgpd-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.55rem;
-  margin-top: 0.75rem;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
 }
 
 .section-subhead {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-secondary);
-  margin: 1.5rem 0 0.65rem;
+  margin: var(--space-xl) 0 var(--space-sm);
 }
 
 .history-list {
@@ -622,7 +1148,7 @@ body {
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 0.55rem;
+  gap: var(--space-xs);
 }
 
 .history-item {
@@ -633,18 +1159,18 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-sm);
 }
 
 .history-item-title {
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: var(--text-base);
+  font-weight: 700;
   color: var(--text-primary);
 }
 
 .history-item-sub {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   color: var(--text-muted);
   margin-top: 0.2rem;
 }
@@ -652,26 +1178,26 @@ body {
 .feedback-banner {
   padding: 0.75rem 0.95rem;
   border-radius: var(--radius-sm);
-  font-size: 0.84rem;
-  font-weight: 500;
-  margin-top: 0.85rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-top: var(--space-sm);
   border: 1px solid var(--border-strong);
   background-color: var(--bg-subtle);
   color: var(--text-primary);
 }
 
-/* Lista de Princípios Biomecânicos (Aba Técnica) */
+/* Lista de Princípios Biomecânicos (Aba Postura Segura) */
 .principle-list {
   display: grid;
-  gap: 0.75rem;
-  margin-top: 0.75rem;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
 }
 
 .principle-row {
   display: grid;
   grid-template-columns: 36px 1fr;
-  gap: 0.75rem;
-  padding: 0.85rem;
+  gap: var(--space-sm);
+  padding: var(--space-md);
   background-color: var(--bg-subtle);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -679,33 +1205,34 @@ body {
 
 .principle-num {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 800;
   color: var(--accent);
   padding-top: 0.1rem;
 }
 
 .principle-content strong {
   display: block;
-  font-size: 0.92rem;
+  font-size: var(--text-base);
   color: var(--text-primary);
   margin-bottom: 0.2rem;
 }
 
 .principle-content p {
   margin: 0;
-  font-size: 0.84rem;
+  font-size: var(--text-sm);
   color: var(--text-secondary);
 }
 
-/* Barra de Navegação Inferior (Dock Obsidian) */
+/* Barra de Navegação Inferior Responsiva ([UI-02]) */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: var(--bottom-nav-height);
-  background: rgba(8, 8, 8, 0.92);
+  min-height: var(--bottom-nav-height);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--nav-bg);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-top: 1px solid var(--border-color);
@@ -714,7 +1241,7 @@ body {
 
 .bottom-nav-inner {
   max-width: 680px;
-  height: 100%;
+  height: var(--bottom-nav-height);
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -722,7 +1249,8 @@ body {
 
 .nav-tab {
   position: relative;
-  min-height: 48px;
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
   border: none;
   background: transparent;
   color: var(--text-muted);
@@ -732,8 +1260,8 @@ body {
   justify-content: center;
   gap: 0.28rem;
   font-family: inherit;
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: var(--text-xs);
+  font-weight: 700;
   letter-spacing: 0.01em;
   cursor: pointer;
   transition: color 0.15s ease;
@@ -742,9 +1270,10 @@ body {
 .nav-tab::before {
   content: "";
   position: absolute;
-  top: -1px;
-  width: 28px;
-  height: 2px;
+  top: 0;
+  width: 36px;
+  height: 3px;
+  border-radius: 0 0 4px 4px;
   background-color: transparent;
   transition: background-color 0.15s ease;
 }
@@ -762,17 +1291,25 @@ body {
 }
 
 .nav-tab svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.9;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-@media (max-width: 420px) {
-  .specs-grid {
+@media (max-width: 480px) {
+  .env-filter {
+    grid-template-columns: 1fr;
+  }
+
+  .card-visual-row {
+    grid-template-columns: 1fr;
+  }
+
+  .card-actions {
     grid-template-columns: 1fr;
   }
 }

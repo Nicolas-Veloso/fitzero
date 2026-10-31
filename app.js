@@ -1,8 +1,9 @@
 /**
  * @file app.js
- * @description Orquestrador do PWA Core, Registro do Service Worker, Detector de Conectividade,
- * Instalação Nativa (A2HS) e Integração com o Storage Manager LGPD — FitZero.
- * Responsável: Dev 1 (Tech Lead & PWA Core) — [PWA-01, PWA-02, PWA-03]
+ * @description Orquestrador do PWA Core, Interface Mobile-First, Navegação por Abas,
+ * Filtro de Ambiente ("Quarto / Laje" vs. "Praça / Barras"), Gaveta de Detalhes com
+ * Vetores Anatômicos SVG e Integração com o Storage Manager LGPD — FitZero.
+ * Responsáveis: Dev 1 [PWA-01..03] & Dev 2 [UI-01..03]
  */
 
 import {
@@ -14,11 +15,185 @@ import {
   clearUserData
 } from './storage.js';
 
+const HIGH_CONTRAST_KEY = 'fitzero_high_contrast';
+
 const state = {
   exercises: [],
   currentEnv: 'casa',
+  currentFocus: 'todos',
+  activeExerciseId: null,
+  lastFocusedTrigger: null,
   deferredInstallPrompt: null
 };
+
+/**
+ * Biblioteca de Vetores Anatômicos SVG Inline Otimizados (< 2 KB cada)
+ * Destaca: Músculo Ativo (--accent), Eixo da Coluna (--accent-teal) e Base de Apoio (--warning)
+ */
+function getExerciseAnatomySvg(exerciseId) {
+  const vectors = {
+    'flexao-parede-solo': `
+      <svg viewBox="0 0 240 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Linha de Solo -->
+        <line x1="20" y1="118" x2="220" y2="118" stroke="var(--border-strong)" stroke-width="2"/>
+        <!-- Pontos de Apoio (Mãos e Ponta dos Pés) -->
+        <circle cx="68" cy="114" r="6" fill="var(--warning)"/>
+        <circle cx="192" cy="114" r="6" fill="var(--warning)"/>
+        <!-- Eixo Neutro da Coluna e Pernas -->
+        <line x1="62" y1="62" x2="192" y2="112" stroke="var(--accent-teal)" stroke-width="4" stroke-linecap="round"/>
+        <!-- Cabeça Alinhada -->
+        <circle cx="50" cy="56" r="10" stroke="var(--text-primary)" stroke-width="3"/>
+        <!-- Grupo Muscular Ativo: Peitoral, Deltoide Anterior e Tríceps -->
+        <path class="svg-muscle-highlight" d="M64 62 L88 72 L78 92 L68 114" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <ellipse class="svg-muscle-highlight" cx="82" cy="70" rx="14" ry="7" transform="rotate(21 82 70)" fill="var(--accent)" fill-opacity="0.35"/>
+        <!-- Vetor de Força (Empurrar o Chão) -->
+        <path class="svg-force-arrow" d="M68 102 V34 M62 42 L68 32 L74 42" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+
+    'agachamento-livre': `
+      <svg viewBox="0 0 240 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Linha de Solo -->
+        <line x1="30" y1="122" x2="210" y2="122" stroke="var(--border-strong)" stroke-width="2"/>
+        <!-- Apoio Plantar Completo (Calcanhares firmes) -->
+        <rect x="108" y="115" width="24" height="7" rx="3" fill="var(--warning)"/>
+        <!-- Eixo Neutro da Coluna -->
+        <line x1="104" y1="38" x2="88" y2="78" stroke="var(--accent-teal)" stroke-width="4" stroke-linecap="round"/>
+        <!-- Cabeça e Braços à Frente para Equilíbrio -->
+        <circle cx="108" cy="24" r="9" stroke="var(--text-primary)" stroke-width="3"/>
+        <line x1="102" y1="44" x2="144" y2="48" stroke="var(--text-secondary)" stroke-width="3" stroke-linecap="round"/>
+        <!-- Grupo Muscular Ativo: Quadríceps e Glúteos -->
+        <path class="svg-muscle-highlight" d="M88 78 L128 84 L116 116" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle class="svg-muscle-highlight" cx="88" cy="80" r="8" fill="var(--accent)" fill-opacity="0.4"/>
+        <!-- Vetor de Força Vertical -->
+        <path class="svg-force-arrow" d="M158 106 V40 M152 48 L158 38 L164 48" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+
+    'prancha-isometrica': `
+      <svg viewBox="0 0 240 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Linha de Solo -->
+        <line x1="20" y1="116" x2="220" y2="116" stroke="var(--border-strong)" stroke-width="2"/>
+        <!-- Pontos de Apoio: Antebraço e Pés -->
+        <rect x="52" y="109" width="28" height="7" rx="3" fill="var(--warning)"/>
+        <circle cx="190" cy="111" r="6" fill="var(--warning)"/>
+        <!-- Eixo Reto da Coluna ao Calcanhar -->
+        <line x1="60" y1="78" x2="190" y2="108" stroke="var(--accent-teal)" stroke-width="4" stroke-linecap="round"/>
+        <!-- Apoio de Cotovelo 90 graus -->
+        <line x1="64" y1="78" x2="64" y2="112" stroke="var(--text-primary)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="46" cy="74" r="9" stroke="var(--text-primary)" stroke-width="3"/>
+        <!-- Grupo Muscular Ativo: Core / Parede Abdominal -->
+        <path class="svg-muscle-highlight" d="M78 84 L142 98" stroke="var(--accent)" stroke-width="8" stroke-linecap="round"/>
+        <!-- Vetor Anti-Gravidade no Core -->
+        <path class="svg-force-arrow" d="M112 112 V62 M106 70 L112 60 L118 70" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+
+    'remada-australiana-praca': `
+      <svg viewBox="0 0 240 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Estrutura da Barra Baixa da Praça -->
+        <line x1="88" y1="24" x2="88" y2="122" stroke="var(--border-strong)" stroke-width="3"/>
+        <line x1="20" y1="122" x2="220" y2="122" stroke="var(--border-strong)" stroke-width="2"/>
+        <!-- Pontos de Apoio: Pegada na Barra e Calcanhares no Solo -->
+        <circle cx="88" cy="48" r="7" fill="var(--warning)"/>
+        <circle cx="178" cy="116" r="6" fill="var(--warning)"/>
+        <!-- Eixo Neutro do Corpo em Suspensão Inclinada -->
+        <line x1="78" y1="68" x2="178" y2="116" stroke="var(--accent-teal)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="66" cy="60" r="9" stroke="var(--text-primary)" stroke-width="3"/>
+        <!-- Grupo Muscular Ativo: Dorsais, Escápulas e Bíceps -->
+        <path class="svg-muscle-highlight" d="M88 48 L104 68 L86 76" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Vetor de Puxada Escapular -->
+        <path class="svg-force-arrow" d="M126 96 L96 58 M96 68 L94 56 L106 60" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+
+    'barra-fixa-escapular': `
+      <svg viewBox="0 0 240 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Barra Alta da Praça -->
+        <line x1="50" y1="18" x2="190" y2="18" stroke="var(--border-strong)" stroke-width="4" stroke-linecap="round"/>
+        <!-- Pontos de Apoio: Pegada Firme na Barra -->
+        <circle cx="96" cy="18" r="6" fill="var(--warning)"/>
+        <circle cx="144" cy="18" r="6" fill="var(--warning)"/>
+        <!-- Braços Estendidos -->
+        <line x1="96" y1="18" x2="106" y2="52" stroke="var(--text-primary)" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="144" y1="18" x2="134" y2="52" stroke="var(--text-primary)" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Cabeça e Coluna Alinhada -->
+        <circle cx="120" cy="40" r="9" stroke="var(--text-primary)" stroke-width="3"/>
+        <line x1="120" y1="52" x2="120" y2="122" stroke="var(--accent-teal)" stroke-width="4" stroke-linecap="round"/>
+        <!-- Grupo Muscular Ativo: Cintura Escapular e Grande Dorsal -->
+        <path class="svg-muscle-highlight" d="M104 54 H136 L128 76 H112 Z" fill="var(--accent)" fill-opacity="0.38" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Vetor de Depressão Escapular (Ombros para baixo) -->
+        <path class="svg-force-arrow" d="M82 44 V78 M76 70 L82 80 L88 70" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+
+    'afundo-estatico-banco': `
+      <svg viewBox="0 0 240 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Linha de Solo e Banco da Praça para Apoio -->
+        <line x1="20" y1="122" x2="220" y2="122" stroke="var(--border-strong)" stroke-width="2"/>
+        <path d="M52 72 H76 V122" stroke="var(--border-strong)" stroke-width="3" stroke-linecap="round"/>
+        <!-- Pontos de Apoio: Mão no Banco, Pé da Frente e Ponta do Pé de Trás -->
+        <circle cx="76" cy="72" r="5" fill="var(--warning)"/>
+        <rect x="108" y="115" width="20" height="7" rx="3" fill="var(--warning)"/>
+        <circle cx="174" cy="116" r="5" fill="var(--warning)"/>
+        <!-- Coluna Vertical Alinhada -->
+        <line x1="120" y1="36" x2="120" y2="80" stroke="var(--accent-teal)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="120" cy="22" r="9" stroke="var(--text-primary)" stroke-width="3"/>
+        <line x1="120" y1="48" x2="76" y2="72" stroke="var(--text-secondary)" stroke-width="3" stroke-linecap="round"/>
+        <!-- Grupo Muscular Ativo: Pernas em Ângulo de 90 Graus -->
+        <path class="svg-muscle-highlight" d="M120 80 L116 116 M120 80 L146 112 L174 116" stroke="var(--accent)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Vetor de Controle Vertical -->
+        <path class="svg-force-arrow" d="M188 98 V42 M182 50 L188 40 L194 50" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`
+  };
+
+  return (
+    vectors[exerciseId] ||
+    `<svg viewBox="0 0 240 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line x1="30" y1="118" x2="210" y2="118" stroke="var(--border-strong)" stroke-width="2"/>
+      <circle cx="120" cy="32" r="10" stroke="var(--text-primary)" stroke-width="3"/>
+      <line x1="120" y1="44" x2="120" y2="90" stroke="var(--accent-teal)" stroke-width="4" stroke-linecap="round"/>
+      <path class="svg-muscle-highlight" d="M92 58 L120 48 L148 58" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="104" cy="114" r="6" fill="var(--warning)"/>
+      <circle cx="136" cy="114" r="6" fill="var(--warning)"/>
+    </svg>`
+  );
+}
+
+/**
+ * Classifica o grupo muscular do exercício para o filtro rápido de chips ([UI-03])
+ */
+function matchesMuscleFocus(exercise, focusFilter) {
+  if (!focusFilter || focusFilter === 'todos') return true;
+  const text = `${exercise.foco_muscular || ''} ${exercise.nome_popular || ''}`.toLowerCase();
+
+  if (focusFilter === 'superior') {
+    return (
+      text.includes('peito') ||
+      text.includes('ombro') ||
+      text.includes('tríceps') ||
+      text.includes('costas') ||
+      text.includes('bíceps') ||
+      text.includes('braço') ||
+      text.includes('pegada')
+    );
+  }
+  if (focusFilter === 'inferior') {
+    return (
+      text.includes('coxa') ||
+      text.includes('glúteo') ||
+      text.includes('perna') ||
+      text.includes('quadril') ||
+      text.includes('agachamento') ||
+      text.includes('passada')
+    );
+  }
+  if (focusFilter === 'core') {
+    return (
+      text.includes('abdômen') ||
+      text.includes('lombar') ||
+      text.includes('core') ||
+      text.includes('postura') ||
+      text.includes('estabilidade')
+    );
+  }
+  return true;
+}
 
 /**
  * 1. Registro e Monitoramento do Service Worker ([PWA-02])
@@ -133,18 +308,22 @@ function setupInstallPrompt() {
 }
 
 /**
- * 4. Navegação de Abas do App Shell e Alto Contraste
+ * 4. Navegação de Abas do App Shell ([UI-02]) e Alto Contraste ([UI-01])
  */
 function setupNavigationAndTheme() {
-  const navButtons = document.querySelectorAll('.nav-tab');
+  const navButtons = Array.from(document.querySelectorAll('.nav-tab'));
   const panels = document.querySelectorAll('.tab-panel');
   const contrastBtn = document.getElementById('contrast-toggle');
 
-  function activateTab(targetId) {
+  function activateTab(targetId, moveFocus = false) {
     navButtons.forEach((btn) => {
       const isMatch = btn.dataset.target === targetId;
       btn.classList.toggle('active', isMatch);
       btn.setAttribute('aria-selected', String(isMatch));
+      btn.setAttribute('tabindex', isMatch ? '0' : '-1');
+      if (isMatch && moveFocus) {
+        btn.focus();
+      }
     });
 
     panels.forEach((panel) => {
@@ -152,10 +331,31 @@ function setupNavigationAndTheme() {
     });
   }
 
-  navButtons.forEach((btn) => {
+  navButtons.forEach((btn, index) => {
     btn.addEventListener('click', () => {
       if (btn.dataset.target) {
-        activateTab(btn.dataset.target);
+        activateTab(btn.dataset.target, false);
+      }
+    });
+
+    btn.addEventListener('keydown', (event) => {
+      let nextIndex = null;
+      if (event.key === 'ArrowRight') {
+        nextIndex = (index + 1) % navButtons.length;
+      } else if (event.key === 'ArrowLeft') {
+        nextIndex = (index - 1 + navButtons.length) % navButtons.length;
+      } else if (event.key === 'Home') {
+        nextIndex = 0;
+      } else if (event.key === 'End') {
+        nextIndex = navButtons.length - 1;
+      }
+
+      if (nextIndex !== null) {
+        event.preventDefault();
+        const targetBtn = navButtons[nextIndex];
+        if (targetBtn && targetBtn.dataset.target) {
+          activateTab(targetBtn.dataset.target, true);
+        }
       }
     });
   });
@@ -167,23 +367,173 @@ function setupNavigationAndTheme() {
   };
   if (window.location.hash && hashMap[window.location.hash]) {
     activateTab(hashMap[window.location.hash]);
+  } else {
+    activateTab('tab-treinar');
   }
 
+  // Persistência da preferência de Alto Contraste ([UI-01])
   if (contrastBtn) {
+    try {
+      const savedContrast = window.localStorage.getItem(HIGH_CONTRAST_KEY) === 'true';
+      if (savedContrast) {
+        document.body.classList.add('high-contrast');
+        contrastBtn.setAttribute('aria-pressed', 'true');
+      }
+    } catch (_) {
+      // Ignora caso LocalStorage esteja restrito
+    }
+
     contrastBtn.addEventListener('click', () => {
       const enabled = document.body.classList.toggle('high-contrast');
       contrastBtn.setAttribute('aria-pressed', String(enabled));
+      try {
+        window.localStorage.setItem(HIGH_CONTRAST_KEY, String(enabled));
+      } catch (_) {
+        // Ignora erro de escrita
+      }
     });
   }
 }
 
 /**
- * 5. Carregamento do Catálogo Offline e Renderização dos Cards
+ * 5. Gaveta Lateral / Modal Leve de Detalhes do Exercício e Vetor Anatômico ([UI-03])
+ */
+function setupExerciseDrawer(onCompleteExercise) {
+  const backdrop = document.getElementById('exercise-drawer-backdrop');
+  const drawerEl = backdrop ? backdrop.querySelector('.exercise-drawer') : null;
+  const btnClose = document.getElementById('btn-close-drawer');
+  const btnComplete = document.getElementById('btn-drawer-complete');
+
+  const envBadge = document.getElementById('drawer-exercise-env');
+  const levelBadge = document.getElementById('drawer-exercise-level');
+  const timeBadge = document.getElementById('drawer-exercise-time');
+  const titleEl = document.getElementById('drawer-exercise-title');
+  const svgContainer = document.getElementById('drawer-svg-container');
+  const focusEl = document.getElementById('drawer-exercise-focus');
+  const seriesEl = document.getElementById('drawer-exercise-series');
+  const regressionEl = document.getElementById('drawer-exercise-regression');
+  const attentionEl = document.getElementById('drawer-exercise-attention');
+
+  function openDrawer(exerciseId, triggerElement) {
+    const exercise = state.exercises.find((item) => item.id === exerciseId);
+    if (!exercise || !backdrop) return;
+
+    state.activeExerciseId = exercise.id;
+    state.lastFocusedTrigger = triggerElement || document.activeElement;
+
+    if (envBadge) {
+      envBadge.textContent = exercise.ambiente === 'praca' ? 'Praça / Barras' : 'Quarto / Laje';
+    }
+    if (levelBadge) {
+      levelBadge.textContent = exercise.nivel || 'Iniciante';
+    }
+    if (timeBadge) {
+      timeBadge.textContent = `${exercise.tempo_estimado_min || 10} MIN`;
+    }
+    if (titleEl) {
+      titleEl.textContent = exercise.nome_popular;
+    }
+    if (svgContainer) {
+      svgContainer.innerHTML = getExerciseAnatomySvg(exercise.id);
+      svgContainer.setAttribute(
+        'aria-label',
+        `Ilustração anatômica de ${exercise.nome_popular}: foco em ${exercise.foco_muscular}`
+      );
+    }
+    if (focusEl) {
+      focusEl.textContent = exercise.foco_muscular || 'Corpo Inteiro';
+    }
+    if (seriesEl) {
+      seriesEl.textContent = exercise.series_recomendadas || '3 séries controladas';
+    }
+    if (regressionEl) {
+      regressionEl.textContent = exercise.regressao_segura || '';
+    }
+    if (attentionEl) {
+      attentionEl.textContent = exercise.pontos_atencao || '';
+    }
+
+    backdrop.classList.remove('hidden');
+    document.body.classList.add('drawer-open');
+
+    if (btnClose) {
+      btnClose.focus();
+    } else if (drawerEl) {
+      drawerEl.focus();
+    }
+  }
+
+  function closeDrawer() {
+    if (!backdrop || backdrop.classList.contains('hidden')) return;
+    backdrop.classList.add('hidden');
+    document.body.classList.remove('drawer-open');
+    state.activeExerciseId = null;
+
+    if (state.lastFocusedTrigger && typeof state.lastFocusedTrigger.focus === 'function') {
+      state.lastFocusedTrigger.focus();
+    }
+  }
+
+  if (btnClose) {
+    btnClose.addEventListener('click', closeDrawer);
+  }
+
+  if (backdrop) {
+    backdrop.addEventListener('click', (event) => {
+      if (event.target === backdrop) {
+        closeDrawer();
+      }
+    });
+  }
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && backdrop && !backdrop.classList.contains('hidden')) {
+      event.preventDefault();
+      closeDrawer();
+    }
+  });
+
+  if (btnComplete) {
+    btnComplete.addEventListener('click', () => {
+      const exercise = state.exercises.find((item) => item.id === state.activeExerciseId);
+      if (!exercise) return;
+
+      onCompleteExercise(exercise, btnComplete, 'Concluir Série e Salvar');
+    });
+  }
+
+  return { openDrawer, closeDrawer };
+}
+
+/**
+ * 6. Carregamento do Catálogo Offline e Renderização dos Cards ([UI-03])
  */
 async function loadExercisesCatalog() {
   const listEl = document.getElementById('exercises-list');
   const summaryEl = document.getElementById('env-summary');
+  const contextTextEl = document.getElementById('env-context-text');
   const envButtons = document.querySelectorAll('.env-btn');
+  const focusChips = document.querySelectorAll('.focus-chip');
+
+  function completeExerciseAction(exercise, buttonEl, defaultLabel = 'Concluir Série') {
+    const result = saveWorkoutRecord({
+      data_iso: new Date().toISOString(),
+      treino_id: exercise.id || 'treino-calistenia',
+      duracao_min: Number(exercise.tempo_estimado_min) || 10,
+      exercicios_concluidos: [exercise.nome_popular || exercise.id]
+    });
+
+    if (result.success && buttonEl) {
+      buttonEl.classList.add('btn-done');
+      buttonEl.innerHTML = '<span>Série Registrada!</span>';
+      setTimeout(() => {
+        buttonEl.classList.remove('btn-done');
+        buttonEl.innerHTML = `<span>${escapeHtml(defaultLabel)}</span>`;
+      }, 1500);
+    }
+  }
+
+  const drawerController = setupExerciseDrawer(completeExerciseAction);
 
   try {
     const response = await fetch('./exercises.json');
@@ -194,19 +544,34 @@ async function loadExercisesCatalog() {
     state.exercises = [];
   }
 
+  function updateEnvContextCopy() {
+    if (!contextTextEl) return;
+    if (state.currentEnv === 'praca') {
+      contextTextEl.textContent =
+        'Modo Praça / Barras: exercícios de tração, suspensão escapular e pernas usando barras e bancos públicos.';
+    } else {
+      contextTextEl.textContent =
+        'Modo Quarto / Laje: rotina silenciosa de solo, sem impacto e sem salto, ideal para espaços reduzidos.';
+    }
+  }
+
   function renderExercises() {
     if (!listEl) return;
-    const filtered = state.exercises.filter((ex) => ex.ambiente === state.currentEnv);
+
+    const envFiltered = state.exercises.filter((ex) => ex.ambiente === state.currentEnv);
+    const filtered = envFiltered.filter((ex) => matchesMuscleFocus(ex, state.currentFocus));
     const totalMin = filtered.reduce((acc, ex) => acc + (Number(ex.tempo_estimado_min) || 0), 0);
 
     if (summaryEl) {
-      summaryEl.textContent = `${filtered.length} exercícios • ${totalMin} min`;
+      summaryEl.textContent = `${filtered.length} exercício${filtered.length === 1 ? '' : 's'} • ${totalMin} min`;
     }
+
+    updateEnvContextCopy();
 
     if (filtered.length === 0) {
       listEl.innerHTML = `
         <article class="card">
-          <p class="card-meta" style="margin:0;">Nenhum exercício listado para este ambiente.</p>
+          <p class="card-meta" style="margin:0;">Nenhum exercício encontrado para este filtro. Selecione "Todos" para ver a rotina completa do ambiente.</p>
         </article>`;
       return;
     }
@@ -214,6 +579,7 @@ async function loadExercisesCatalog() {
     listEl.innerHTML = filtered
       .map((ex, idx) => {
         const indexNum = String(idx + 1).padStart(2, '0');
+        const envLabel = ex.ambiente === 'praca' ? 'Praça / Barras' : 'Quarto / Laje';
         return `
       <article class="card" data-exercise-id="${escapeHtml(ex.id)}">
         <div class="card-top">
@@ -221,67 +587,81 @@ async function loadExercisesCatalog() {
             <span class="card-index">${indexNum}</span>
             <h3 class="card-title">${escapeHtml(ex.nome_popular)}</h3>
           </div>
-          <span class="tag">${escapeHtml(ex.tempo_estimado_min)} MIN</span>
+          <span class="tag tag-accent">${escapeHtml(ex.tempo_estimado_min)} MIN</span>
         </div>
 
-        <div class="specs-grid">
-          <div class="spec-box">
-            <span class="spec-label">Foco Muscular</span>
-            <span class="spec-value">${escapeHtml(ex.foco_muscular)}</span>
-          </div>
-          <div class="spec-box">
-            <span class="spec-label">Volume Sugerido</span>
-            <span class="spec-value">${escapeHtml(ex.series_recomendadas)}</span>
+        <div class="card-badges-row" aria-label="Classificação do exercício">
+          <span class="tag tag-teal">${escapeHtml(ex.nivel || 'Iniciante')}</span>
+          <span class="tag">${escapeHtml(ex.foco_muscular)}</span>
+          <span class="tag">${escapeHtml(envLabel)}</span>
+        </div>
+
+        <div class="card-visual-row">
+          <button
+            type="button"
+            class="card-thumb-btn btn-open-drawer"
+            data-id="${escapeHtml(ex.id)}"
+            aria-label="Ver ilustração anatômica e detalhes de ${escapeHtml(ex.nome_popular)}"
+            title="Ver vetor anatômico"
+          >
+            ${getExerciseAnatomySvg(ex.id)}
+          </button>
+
+          <div class="specs-grid">
+            <div class="spec-box">
+              <span class="spec-label">Volume Sugerido</span>
+              <span class="spec-value">${escapeHtml(ex.series_recomendadas)}</span>
+            </div>
+            <div class="spec-box">
+              <span class="spec-label">Adaptação Iniciante</span>
+              <span class="spec-value">${escapeHtml(ex.regressao_segura)}</span>
+            </div>
           </div>
         </div>
 
-        <details class="tech-guide">
-          <summary>Guia de execução e adaptação</summary>
-          <div class="tech-guide-body">
-            <div class="tech-item">
-              <strong>Progressão Iniciante</strong>
-              <span>${escapeHtml(ex.regressao_segura)}</span>
-            </div>
-            <div class="tech-item">
-              <strong>Alinhamento Articular</strong>
-              <span>${escapeHtml(ex.pontos_atencao)}</span>
-            </div>
-          </div>
-        </details>
+        <div class="card-actions">
+          <button
+            type="button"
+            class="btn btn-secondary btn-block btn-open-drawer"
+            data-id="${escapeHtml(ex.id)}"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 16v-4M12 8h.01"/>
+            </svg>
+            <span>Postura &amp; Vetor</span>
+          </button>
 
-        <button
-          type="button"
-          class="btn btn-primary btn-block btn-complete-workout"
-          data-id="${escapeHtml(ex.id)}"
-          data-nome="${escapeHtml(ex.nome_popular)}"
-          data-duracao="${Number(ex.tempo_estimado_min) || 10}"
-        >
-          <span>Concluir Série</span>
-        </button>
+          <button
+            type="button"
+            class="btn btn-primary btn-block btn-complete-workout"
+            data-id="${escapeHtml(ex.id)}"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            <span>Concluir Série</span>
+          </button>
+        </div>
       </article>`;
       })
       .join('');
 
+    listEl.querySelectorAll('.btn-open-drawer').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const exId = btn.getAttribute('data-id');
+        if (exId) {
+          drawerController.openDrawer(exId, btn);
+        }
+      });
+    });
+
     listEl.querySelectorAll('.btn-complete-workout').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const treinoId = btn.getAttribute('data-id') || 'treino-calistenia';
-        const nomeExercicio = btn.getAttribute('data-nome') || treinoId;
-        const duracaoMin = Number(btn.getAttribute('data-duracao')) || 10;
-
-        const result = saveWorkoutRecord({
-          data_iso: new Date().toISOString(),
-          treino_id: treinoId,
-          duracao_min: duracaoMin,
-          exercicios_concluidos: [nomeExercicio]
-        });
-
-        if (result.success) {
-          btn.classList.add('btn-done');
-          btn.innerHTML = '<span>Série Registrada no Histórico</span>';
-          setTimeout(() => {
-            btn.classList.remove('btn-done');
-            btn.innerHTML = '<span>Concluir Série</span>';
-          }, 1600);
+        const exId = btn.getAttribute('data-id');
+        const exercise = state.exercises.find((item) => item.id === exId);
+        if (exercise) {
+          completeExerciseAction(exercise, btn, 'Concluir Série');
         }
       });
     });
@@ -299,11 +679,23 @@ async function loadExercisesCatalog() {
     });
   });
 
+  focusChips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      state.currentFocus = chip.getAttribute('data-focus') || 'todos';
+      focusChips.forEach((c) => {
+        const isCurrent = c === chip;
+        c.classList.toggle('active', isCurrent);
+        c.setAttribute('aria-pressed', String(isCurrent));
+      });
+      renderExercises();
+    });
+  });
+
   renderExercises();
 }
 
 /**
- * 6. Integração da Aba Histórico e Portabilidade JSON ([PWA-03])
+ * 7. Integração da Aba Histórico e Portabilidade JSON ([PWA-03])
  */
 function setupStorageAndHistoryUI() {
   const totalTreinosEl = document.getElementById('stat-total-treinos');
