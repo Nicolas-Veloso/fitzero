@@ -1,0 +1,68 @@
+[
+  {
+    "id": "flexao-parede-solo",
+    "nome_popular": "Flexão de Braço (Parede ou Chão)",
+    "ambiente": "casa",
+    "nivel": "Iniciante / Adaptado",
+    "tempo_estimado_min": 10,
+    "foco_muscular": "Peito, Ombros e Tríceps",
+    "series_recomendadas": "3 séries de 8 a 12 repetições",
+    "regressao_segura": "Comece em pé empurrando a parede ou apoiando as mãos na borda firme da cama antes de ir para o chão.",
+    "pontos_atencao": "Mantenha os cotovelos apontando levemente para trás (ângulo de 45°) e o abdômen firme para a lombar não afundar."
+  },
+  {
+    "id": "agachamento-livre",
+    "nome_popular": "Agachamento Livre Controlado",
+    "ambiente": "casa",
+    "nivel": "Iniciante",
+    "tempo_estimado_min": 12,
+    "foco_muscular": "Coxas, Glúteos e Core",
+    "series_recomendadas": "3 séries de 10 a 15 repetições",
+    "regressao_segura": "Use uma cadeira ou banco atrás de você: sente encostando de leve e levante empurrando o chão com o calcanhar.",
+    "pontos_atencao": "Alinhe os joelhos na direção da ponta dos pés e mantenha o peito aberto olhando para a frente."
+  },
+  {
+    "id": "prancha-isometrica",
+    "nome_popular": "Prancha Abdominal no Solo",
+    "ambiente": "casa",
+    "nivel": "Iniciante",
+    "tempo_estimado_min": 8,
+    "foco_muscular": "Abdômen, Lombar e Estabilidade",
+    "series_recomendadas": "3 séries de 20 a 30 segundos",
+    "regressao_segura": "Apoie os antebraços e os joelhos no chão mantendo o tronco reto da cabeça até os joelhos.",
+    "pontos_atencao": "Empurre o chão com os antebraços para afastar os ombros das orelhas e respire de forma contínua sem prender o ar."
+  },
+  {
+    "id": "remada-australiana-praca",
+    "nome_popular": "Remada Inclinada na Barra Baixa",
+    "ambiente": "praca",
+    "nivel": "Iniciante",
+    "tempo_estimado_min": 15,
+    "foco_muscular": "Costas, Bíceps e Pegada",
+    "series_recomendadas": "3 séries de 8 a 10 repetições",
+    "regressao_segura": "Quanto mais em pé você ficar (pés mais próximos da linha da barra), mais leve e seguro fica o movimento.",
+    "pontos_atencao": "Feche as escápulas (junte as costas) antes de dobrar os cotovelos e evite encolher o pescoço."
+  },
+  {
+    "id": "barra-fixa-escapular",
+    "nome_popular": "Suspensão Ativa na Barra",
+    "ambiente": "praca",
+    "nivel": "Iniciante / Engressante",
+    "tempo_estimado_min": 10,
+    "foco_muscular": "Ombros, Antebraço e Postura",
+    "series_recomendadas": "3 séries de 15 a 25 segundos",
+    "regressao_segura": "Mantenha a ponta dos pés apoiada no chão ou em um degrau para aliviar parte do peso do corpo.",
+    "pontos_atencao": "Segure firme na barra e puxe os ombros para baixo (longe das orelhas), ativando as costas sem dobrar os cotovelos."
+  },
+  {
+    "id": "afundo-estatico-banco",
+    "nome_popular": "Passada Firme (Apoio no Banco da Praça)",
+    "ambiente": "praca",
+    "nivel": "Iniciante",
+    "tempo_estimado_min": 12,
+    "foco_muscular": "Pernas, Equilíbrio e Quadril",
+    "series_recomendadas": "3 séries de 8 repetições por perna",
+    "regressao_segura": "Segure no encosto do banco ou na estrutura da barra para garantir equilíbrio total durante a descida.",
+    "pontos_atencao": "Desça com o tronco reto em direção ao chão, mantendo o calcanhar do pé da frente totalmente apoiado."
+  }
+]

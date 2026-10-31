@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="FitZero — Plataforma leve e 100% offline de calistenia e treino com peso corporal para iniciantes em qualquer ambiente.">
+  <meta name="theme-color" content="#050505">
+  <meta name="color-scheme" content="dark">
+
+  <!-- Meta tags para iOS Safari (A2HS Nativo - [PWA-01]) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FitZero">
+  <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
+
+  <!-- Ícones e Web App Manifest ([PWA-01]) -->
+  <link rel="icon" type="image/svg+xml" href="./assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+
+  <title>FitZero — Calistenia &amp; Peso Corporal</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <!-- Cabeçalho Fixo do App Shell -->
+  <header class="app-header" role="banner">
+    <div class="header-inner">
+      <div class="brand">
+        <img src="./assets/icons/icon.svg" alt="" class="brand-mark" width="30" height="30">
+        <div class="brand-text">
+          <h1 class="brand-title">FIT<span>ZERO</span></h1>
+          <span class="brand-edition">PWA v1.0</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div id="network-status" class="status-badge online" role="status" aria-live="polite" title="Status de operação offline">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="network-status-text">ONLINE</span>
+        </div>
+        <button id="contrast-toggle" type="button" class="btn btn-icon-only" aria-pressed="false" aria-label="Alternar alto contraste para leitura externa" title="Alto Contraste">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="app-main" id="main-content">
+    <!-- Banner de Instalação Nativa A2HS ([PWA-01]) -->
+    <aside id="install-banner" class="install-banner hidden" aria-label="Instalar aplicativo no aparelho">
+      <div class="install-banner-text">
+        <strong>Instalar FitZero no dispositivo</strong>
+        <span>Acesso instantâneo na tela inicial e execução 100% offline.</span>
+      </div>
+      <div class="header-actions">
+        <button id="btn-install-pwa" type="button" class="btn btn-primary">Instalar</button>
+        <button id="btn-dismiss-install" type="button" class="btn btn-secondary" aria-label="Fechar aviso de instalação">Fechar</button>
+      </div>
+    </aside>
+
+    <!-- ABA 1: TREINAR (Catálogo & Sessão) -->
+    <section id="tab-treinar" class="tab-panel" role="region" aria-labelledby="nav-btn-treinar">
+      <div class="section-hero">
+        <span class="section-eyebrow">Protocolo de Base</span>
+        <div class="section-title-row">
+          <h2 class="section-title">Sessão do Dia</h2>
+          <span id="env-summary" class="section-summary">3 exercícios • 30 min</span>
+        </div>
+      </div>
+
+      <!-- Filtro Segmentado de Ambiente -->
+      <div class="env-filter" role="group" aria-label="Selecionar ambiente de treino">
+        <button type="button" class="env-btn active" data-env="casa" aria-pressed="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9.5z"/>
+            <path d="M9 21V13h6v8"/>
+          </svg>
+          <span>Solo &amp; Casa</span>
+        </button>
+        <button type="button" class="env-btn" data-env="praca" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 6h16M6 6v14M18 6v14M6 11h12"/>
+          </svg>
+          <span>Barra &amp; Praça</span>
+        </button>
+      </div>
+
+      <div id="exercises-list" class="card-grid" aria-live="polite">
+        <!-- Renderizado pelo app.js a partir do exercises.json em cache -->
+      </div>
+    </section>
+
+    <!-- ABA 2: HISTÓRICO & DADOS LOCAIS LGPD ([PWA-03]) -->
+    <section id="tab-historico" class="tab-panel hidden" role="region" aria-labelledby="nav-btn-historico">
+      <div class="section-hero">
+        <span class="section-eyebrow">Registro Local</span>
+        <div class="section-title-row">
+          <h2 class="section-title">Desempenho</h2>
+          <span class="section-summary">Armazenamento no Aparelho</span>
+        </div>
+      </div>
+
+      <div class="stats-grid" aria-label="Métricas acumuladas">
+        <div class="stat-card">
+          <span id="stat-total-treinos" class="stat-value">0</span>
+          <span class="stat-label">Sessões</span>
+        </div>
+        <div class="stat-card">
+          <span id="stat-total-minutos" class="stat-value">0</span>
+          <span class="stat-label">Minutos</span>
+        </div>
+        <div class="stat-card">
+          <span id="stat-dias-unicos" class="stat-value">0</span>
+          <span class="stat-label">Dias Ativos</span>
+        </div>
+      </div>
+
+      <!-- Painel de Portabilidade e Privacidade ([PWA-03]) -->
+      <article class="card">
+        <div class="card-top" style="margin-bottom: 0.35rem;">
+          <h3 class="card-title">Portabilidade de Dados (JSON)</h3>
+          <span class="tag tag-accent">Zero Nuvem</span>
+        </div>
+        <p class="card-meta">
+          Todos os registros permanecem exclusivamente no armazenamento local do navegador. Exporte um arquivo JSON de backup ou importe registros anteriores sem sobrescrever seu histórico atual.
+        </p>
+        <div class="lgpd-actions">
+          <button id="btn-export-json" type="button" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+            </svg>
+            <span>Exportar Backup</span>
+          </button>
+          <label for="input-import-json" class="btn btn-secondary" role="button" tabindex="0">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 15V3m0 0L8 7m4-4l4 4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+            </svg>
+            <span>Importar JSON</span>
+          </label>
+          <input id="input-import-json" type="file" accept=".json,application/json" class="hidden">
+          <button id="btn-clear-history" type="button" class="btn btn-danger">
+            Limpar
+          </button>
+        </div>
+        <div id="storage-feedback" class="feedback-banner hidden" role="status" aria-live="polite"></div>
+      </article>
+
+      <h3 class="section-subhead">Histórico de Sessões</h3>
+      <ul id="history-list" class="history-list">
+        <!-- Preenchido via storage.js -->
+      </ul>
+    </section>
+
+    <!-- ABA 3: TÉCNICA & MOTOR PWA -->
+    <section id="tab-postura" class="tab-panel hidden" role="region" aria-labelledby="nav-btn-postura">
+      <div class="section-hero">
+        <span class="section-eyebrow">Biomecânica Essencial</span>
+        <div class="section-title-row">
+          <h2 class="section-title">Controle &amp; Postura</h2>
+          <span class="section-summary">Prevenção Articular</span>
+        </div>
+      </div>
+
+      <div class="card-grid">
+        <article class="card">
+          <div class="card-top">
+            <h3 class="card-title">Fundamentos de Execução</h3>
+            <span class="tag">Calistenia</span>
+          </div>
+          <div class="principle-list">
+            <div class="principle-row">
+              <span class="principle-num">01</span>
+              <div class="principle-content">
+                <strong>Depressão Escapular</strong>
+                <p>Mantenha os ombros firmes e afastados das orelhas tanto em movimentos de empurrar no solo quanto na suspensão na barra.</p>
+              </div>
+            </div>
+            <div class="principle-row">
+              <span class="principle-num">02</span>
+              <div class="principle-content">
+                <strong>Alinhamento de Punhos e Cotovelos</strong>
+                <p>Espalhe os dedos no solo para distribuir a pressão na palma da mão e direcione os cotovelos a 45° do tronco.</p>
+              </div>
+            </div>
+            <div class="principle-row">
+              <span class="principle-num">03</span>
+              <div class="principle-content">
+                <strong>Cadência e Respiração</strong>
+                <p>Controle a descida por 2 segundos e expire de forma contínua na fase concêntrica (momento de maior esforço).</p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Diagnóstico Técnico do PWA Core (Dev 1) -->
+        <article class="card">
+          <div class="card-top">
+            <h3 class="card-title">Infraestrutura Offline-First</h3>
+            <span id="sw-badge" class="tag tag-accent">Verificando...</span>
+          </div>
+          <p id="sw-details" class="card-meta" style="margin-bottom: 0;">
+            Service Worker configurado em estratégia Cache-First estrita (`fitzero-v1`) e armazenamento local com validação de schema.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- Barra de Navegação Inferior (Dock) -->
+  <nav class="bottom-nav" aria-label="Navegação principal">
+    <div class="bottom-nav-inner">
+      <button id="nav-btn-treinar" type="button" class="nav-tab active" data-target="tab-treinar" aria-selected="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 5v14M18 5v14M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/>
+        </svg>
+        <span>Treinar</span>
+      </button>
+      <button id="nav-btn-historico" type="button" class="nav-tab" data-target="tab-historico" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 19h16M7 15v-5M12 15V7M17 15v-3"/>
+        </svg>
+        <span>Histórico</span>
+      </button>
+      <button id="nav-btn-postura" type="button" class="nav-tab" data-target="tab-postura" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+        <span>Técnica</span>
+      </button>
+    </div>
+  </nav>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
