@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="FitZero — Plataforma leve e 100% offline de calistenia e treino com peso corporal para iniciantes em qualquer ambiente.">
   <meta name="theme-color" content="#050505">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="dark light">
 
   <!-- Meta tags para iOS Safari (A2HS Nativo - [PWA-01]) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,11 +23,13 @@
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <!-- Cabeçalho Fixo do App Shell -->
+  <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+
+  <!-- Cabeçalho Fixo do App Shell ([UI-02]) -->
   <header class="app-header" role="banner">
     <div class="header-inner">
       <div class="brand">
-        <img src="./assets/icons/icon.svg" alt="" class="brand-mark" width="30" height="30">
+        <img src="./assets/icons/icon.svg" alt="" class="brand-mark" width="32" height="32">
         <div class="brand-text">
           <h1 class="brand-title">FIT<span>ZERO</span></h1>
           <span class="brand-edition">PWA v1.0</span>
@@ -39,7 +41,14 @@
           <span class="status-dot" aria-hidden="true"></span>
           <span id="network-status-text">ONLINE</span>
         </div>
-        <button id="contrast-toggle" type="button" class="btn btn-icon-only" aria-pressed="false" aria-label="Alternar alto contraste para leitura externa" title="Alto Contraste">
+        <button
+          id="contrast-toggle"
+          type="button"
+          class="btn btn-icon-only"
+          aria-pressed="false"
+          aria-label="Alternar modo de alto contraste para leitura sob luz solar"
+          title="Alto Contraste (Luz Solar)"
+        >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="9"/>
             <path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/>
@@ -63,8 +72,13 @@
       </div>
     </aside>
 
-    <!-- ABA 1: TREINAR (Catálogo & Sessão) -->
-    <section id="tab-treinar" class="tab-panel" role="region" aria-labelledby="nav-btn-treinar">
+    <!-- ABA 1: TREINAR (Catálogo & Sessão - [UI-02], [UI-03]) -->
+    <section
+      id="tab-treinar"
+      class="tab-panel"
+      role="tabpanel"
+      aria-labelledby="nav-btn-treinar"
+    >
       <div class="section-hero">
         <span class="section-eyebrow">Protocolo de Base</span>
         <div class="section-title-row">
@@ -73,21 +87,42 @@
         </div>
       </div>
 
-      <!-- Filtro Segmentado de Ambiente -->
-      <div class="env-filter" role="group" aria-label="Selecionar ambiente de treino">
-        <button type="button" class="env-btn active" data-env="casa" aria-pressed="true">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9.5z"/>
-            <path d="M9 21V13h6v8"/>
-          </svg>
-          <span>Solo &amp; Casa</span>
-        </button>
-        <button type="button" class="env-btn" data-env="praca" aria-pressed="false">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 6h16M6 6v14M18 6v14M6 11h12"/>
-          </svg>
-          <span>Barra &amp; Praça</span>
-        </button>
+      <!-- Toggle de Ambiente ([UI-03]: Quarto / Laje vs. Praça / Barras) -->
+      <div class="env-selector-wrap">
+        <div class="env-filter" role="group" aria-label="Selecionar ambiente de treino">
+          <button type="button" class="env-btn active" data-env="casa" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9.5z"/>
+              <path d="M9 21V13h6v8"/>
+            </svg>
+            <div class="env-btn-copy">
+              <span class="env-btn-title">Quarto / Laje</span>
+              <span class="env-btn-sub">Solo • Sem impacto e sem salto</span>
+            </div>
+          </button>
+          <button type="button" class="env-btn" data-env="praca" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6h16M6 6v14M18 6v14M6 11h12"/>
+            </svg>
+            <div class="env-btn-copy">
+              <span class="env-btn-title">Praça / Barras</span>
+              <span class="env-btn-sub">Estrutura urbana • Suspensão</span>
+            </div>
+          </button>
+        </div>
+
+        <div id="env-context-bar" class="env-context-bar" aria-live="polite">
+          <span class="env-context-dot" aria-hidden="true"></span>
+          <span id="env-context-text">Modo Quarto / Laje: rotina silenciosa de solo, zero saltos e foco em controle articular.</span>
+        </div>
+      </div>
+
+      <!-- Filtro Rápido por Foco Muscular ([UI-03]) -->
+      <div class="focus-filter-bar" role="toolbar" aria-label="Filtrar por foco muscular">
+        <button type="button" class="focus-chip active" data-focus="todos" aria-pressed="true">Todos</button>
+        <button type="button" class="focus-chip" data-focus="superior" aria-pressed="false">Tronco &amp; Braços</button>
+        <button type="button" class="focus-chip" data-focus="inferior" aria-pressed="false">Pernas &amp; Base</button>
+        <button type="button" class="focus-chip" data-focus="core" aria-pressed="false">Core &amp; Postura</button>
       </div>
 
       <div id="exercises-list" class="card-grid" aria-live="polite">
@@ -95,13 +130,18 @@
       </div>
     </section>
 
-    <!-- ABA 2: HISTÓRICO & DADOS LOCAIS LGPD ([PWA-03]) -->
-    <section id="tab-historico" class="tab-panel hidden" role="region" aria-labelledby="nav-btn-historico">
+    <!-- ABA 2: HISTÓRICO & DADOS LOCAIS LGPD ([UI-02], [PWA-03]) -->
+    <section
+      id="tab-historico"
+      class="tab-panel hidden"
+      role="tabpanel"
+      aria-labelledby="nav-btn-historico"
+    >
       <div class="section-hero">
         <span class="section-eyebrow">Registro Local</span>
         <div class="section-title-row">
-          <h2 class="section-title">Desempenho</h2>
-          <span class="section-summary">Armazenamento no Aparelho</span>
+          <h2 class="section-title">Dias Concluídos</h2>
+          <span class="section-summary">100% no Aparelho</span>
         </div>
       </div>
 
@@ -122,7 +162,7 @@
 
       <!-- Painel de Portabilidade e Privacidade ([PWA-03]) -->
       <article class="card">
-        <div class="card-top" style="margin-bottom: 0.35rem;">
+        <div class="card-top">
           <h3 class="card-title">Portabilidade de Dados (JSON)</h3>
           <span class="tag tag-accent">Zero Nuvem</span>
         </div>
@@ -156,17 +196,56 @@
       </ul>
     </section>
 
-    <!-- ABA 3: TÉCNICA & MOTOR PWA -->
-    <section id="tab-postura" class="tab-panel hidden" role="region" aria-labelledby="nav-btn-postura">
+    <!-- ABA 3: POSTURA SEGURA & GUIAS BIOMECÂNICOS ([UI-02]) -->
+    <section
+      id="tab-postura"
+      class="tab-panel hidden"
+      role="tabpanel"
+      aria-labelledby="nav-btn-postura"
+    >
       <div class="section-hero">
         <span class="section-eyebrow">Biomecânica Essencial</span>
         <div class="section-title-row">
-          <h2 class="section-title">Controle &amp; Postura</h2>
+          <h2 class="section-title">Postura Segura</h2>
           <span class="section-summary">Prevenção Articular</span>
         </div>
       </div>
 
       <div class="card-grid">
+        <!-- Guia Visual de Eixos Corporais -->
+        <article class="card">
+          <div class="card-top">
+            <h3 class="card-title">Mapa de Alinhamento Corporal</h3>
+            <span class="tag tag-accent">Guia Visual</span>
+          </div>
+          <p class="card-meta">
+            Nas ilustrações de cada exercício, observe sempre os três indicadores visuais antes de iniciar a série:
+          </p>
+          <div class="anatomy-legend" aria-label="Legenda das ilustrações anatômicas">
+            <div class="legend-item">
+              <span class="legend-swatch swatch-muscle" aria-hidden="true"></span>
+              <div>
+                <strong>Músculo Ativo</strong>
+                <span>Região principal que deve contrair durante o movimento.</span>
+              </div>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch swatch-spine" aria-hidden="true"></span>
+              <div>
+                <strong>Linha da Coluna</strong>
+                <span>Eixo neutro da cabeça ao quadril (sem curvar ou afundar a lombar).</span>
+              </div>
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch swatch-anchor" aria-hidden="true"></span>
+              <div>
+                <strong>Pontos de Apoio</strong>
+                <span>Mãos, antebraços ou calcanhares firmes que estabilizam a articulação.</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
         <article class="card">
           <div class="card-top">
             <h3 class="card-title">Fundamentos de Execução</h3>
@@ -176,22 +255,22 @@
             <div class="principle-row">
               <span class="principle-num">01</span>
               <div class="principle-content">
-                <strong>Depressão Escapular</strong>
-                <p>Mantenha os ombros firmes e afastados das orelhas tanto em movimentos de empurrar no solo quanto na suspensão na barra.</p>
+                <strong>Depressão Escapular (Ombros Longe das Orelhas)</strong>
+                <p>Empurre o chão ou puxe a barra ativando as costas antes de dobrar os cotovelos. Isso protege a articulação do ombro.</p>
               </div>
             </div>
             <div class="principle-row">
               <span class="principle-num">02</span>
               <div class="principle-content">
-                <strong>Alinhamento de Punhos e Cotovelos</strong>
-                <p>Espalhe os dedos no solo para distribuir a pressão na palma da mão e direcione os cotovelos a 45° do tronco.</p>
+                <strong>Alinhamento de Punhos e Cotovelos a 45°</strong>
+                <p>Espalhe bem os dedos no solo para aliviar o punho e direcione os cotovelos levemente para trás (formato de seta, nunca abertos em "T").</p>
               </div>
             </div>
             <div class="principle-row">
               <span class="principle-num">03</span>
               <div class="principle-content">
-                <strong>Cadência e Respiração</strong>
-                <p>Controle a descida por 2 segundos e expire de forma contínua na fase concêntrica (momento de maior esforço).</p>
+                <strong>Cadência Controlada e Respiração Ativa</strong>
+                <p>Desça controlando o peso por 2 segundos (fase excêntrica) e solte o ar ao fazer força para subir, sem prender a respiração.</p>
               </div>
             </div>
           </div>
@@ -211,27 +290,144 @@
     </section>
   </main>
 
-  <!-- Barra de Navegação Inferior (Dock) -->
+  <!-- Gaveta Lateral / Modal Leve de Detalhes do Exercício e Vetor Anatômico ([UI-03]) -->
+  <div
+    id="exercise-drawer-backdrop"
+    class="drawer-backdrop hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="drawer-exercise-title"
+    aria-describedby="drawer-exercise-focus"
+  >
+    <aside class="exercise-drawer" tabindex="-1">
+      <div class="drawer-handle" aria-hidden="true"></div>
+
+      <header class="drawer-header">
+        <div class="drawer-title-group">
+          <div class="drawer-badges">
+            <span id="drawer-exercise-env" class="tag tag-accent">Quarto / Laje</span>
+            <span id="drawer-exercise-level" class="tag">Iniciante</span>
+            <span id="drawer-exercise-time" class="tag">10 MIN</span>
+          </div>
+          <h2 id="drawer-exercise-title" class="drawer-title">Detalhes do Exercício</h2>
+        </div>
+        <button
+          id="btn-close-drawer"
+          type="button"
+          class="btn btn-icon-only"
+          aria-label="Fechar detalhes do exercício"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="drawer-body">
+        <!-- Container do Vetor Anatômico SVG Inline ([UI-03]) -->
+        <figure class="anatomy-stage">
+          <div id="drawer-svg-container" class="anatomy-svg-box" role="img" aria-label="Ilustração anatômica do exercício">
+            <!-- Vetor SVG injetado via app.js -->
+          </div>
+          <figcaption class="anatomy-stage-legend">
+            <span><i class="dot-muscle"></i> Foco Muscular</span>
+            <span><i class="dot-spine"></i> Eixo da Coluna</span>
+            <span><i class="dot-anchor"></i> Base de Apoio</span>
+          </figcaption>
+        </figure>
+
+        <div class="specs-grid">
+          <div class="spec-box">
+            <span class="spec-label">Foco Muscular</span>
+            <span id="drawer-exercise-focus" class="spec-value">—</span>
+          </div>
+          <div class="spec-box">
+            <span class="spec-label">Volume Sugerido</span>
+            <span id="drawer-exercise-series" class="spec-value">—</span>
+          </div>
+        </div>
+
+        <div class="drawer-guidance-list">
+          <div class="guidance-card guidance-safe">
+            <div class="guidance-header">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="M9 12l2 2 4-4"/>
+              </svg>
+              <strong>Adaptação Segura (Iniciante)</strong>
+            </div>
+            <p id="drawer-exercise-regression">—</p>
+          </div>
+
+          <div class="guidance-card guidance-posture">
+            <div class="guidance-header">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 8v4M12 16h.01"/>
+              </svg>
+              <strong>Pontos de Atenção Postural</strong>
+            </div>
+            <p id="drawer-exercise-attention">—</p>
+          </div>
+        </div>
+      </div>
+
+      <footer class="drawer-footer">
+        <button id="btn-drawer-complete" type="button" class="btn btn-primary btn-block">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+          <span>Concluir Série e Salvar</span>
+        </button>
+      </footer>
+    </aside>
+  </div>
+
+  <!-- Barra de Navegação Inferior Responsiva (Uso com uma mão só - [UI-02]) -->
   <nav class="bottom-nav" aria-label="Navegação principal">
-    <div class="bottom-nav-inner">
-      <button id="nav-btn-treinar" type="button" class="nav-tab active" data-target="tab-treinar" aria-selected="true">
+    <div class="bottom-nav-inner" role="tablist" aria-label="Abas do FitZero">
+      <button
+        id="nav-btn-treinar"
+        type="button"
+        role="tab"
+        class="nav-tab active"
+        data-target="tab-treinar"
+        aria-controls="tab-treinar"
+        aria-selected="true"
+      >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M6 5v14M18 5v14M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/>
         </svg>
         <span>Treinar</span>
       </button>
-      <button id="nav-btn-historico" type="button" class="nav-tab" data-target="tab-historico" aria-selected="false">
+      <button
+        id="nav-btn-historico"
+        type="button"
+        role="tab"
+        class="nav-tab"
+        data-target="tab-historico"
+        aria-controls="tab-historico"
+        aria-selected="false"
+      >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4 19h16M7 15v-5M12 15V7M17 15v-3"/>
         </svg>
         <span>Histórico</span>
       </button>
-      <button id="nav-btn-postura" type="button" class="nav-tab" data-target="tab-postura" aria-selected="false">
+      <button
+        id="nav-btn-postura"
+        type="button"
+        role="tab"
+        class="nav-tab"
+        data-target="tab-postura"
+        aria-controls="tab-postura"
+        aria-selected="false"
+      >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           <path d="M9 12l2 2 4-4"/>
         </svg>
-        <span>Técnica</span>
+        <span>Postura Segura</span>
       </button>
     </div>
   </nav>
