@@ -528,9 +528,68 @@ function setupWorkoutSession(getRoutineExercises) {
   let intervalId = null;
   let startedAt = null;
   let historySaved = false;
+  let wakeLock = null;
+  let wakeLockRequest = null;
+  let wakeLockRequestId = 0;
+  let wakeLockWanted = false;
 
   function show(button, visible) {
     if (button) button.classList.toggle('hidden', !visible);
+  }
+
+  function updateWakeLock(snapshot, forceRequest = false) {
+    const shouldHold =
+      snapshot.state === SESSION_STATES.WORK &&
+      !snapshot.paused &&
+      document.visibilityState === 'visible';
+
+    if (!shouldHold) {
+      if (wakeLockWanted || wakeLock || wakeLockRequest) {
+        wakeLockRequestId += 1;
+        wakeLockWanted = false;
+      }
+      if (wakeLock) {
+        const currentLock = wakeLock;
+        wakeLock = null;
+        currentLock.release().catch(() => {});
+      }
+      return;
+    }
+
+    if (wakeLockWanted && !forceRequest) return;
+    wakeLockWanted = true;
+    if (!navigator.wakeLock?.request || wakeLock || wakeLockRequest) return;
+
+    const requestId = ++wakeLockRequestId;
+    const request = navigator.wakeLock.request('screen');
+    wakeLockRequest = request;
+    request
+      .then((lock) => {
+        if (
+          requestId !== wakeLockRequestId ||
+          document.visibilityState !== 'visible' ||
+          session.getSnapshot().state !== SESSION_STATES.WORK ||
+          session.getSnapshot().paused
+        ) {
+          return lock.release().catch(() => {});
+        }
+
+        wakeLock = lock;
+        lock.addEventListener('release', () => {
+          if (wakeLock === lock) {
+            wakeLock = null;
+            wakeLockWanted = false;
+            updateWakeLock(session.getSnapshot(), true);
+          }
+        });
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (wakeLockRequest === request) {
+          wakeLockRequest = null;
+          if (requestId !== wakeLockRequestId) updateWakeLock(session.getSnapshot(), true);
+        }
+      });
   }
 
   function start(exercises) {
@@ -651,6 +710,7 @@ function setupWorkoutSession(getRoutineExercises) {
     show(resumeButton, active && snapshot.paused);
     show(skipButton, active);
     show(endButton, active);
+    updateWakeLock(snapshot);
 
     if (snapshot.state === SESSION_STATES.FINISHED) {
       if (intervalId) window.clearInterval(intervalId);
@@ -658,6 +718,12 @@ function setupWorkoutSession(getRoutineExercises) {
       saveCompletedSession(snapshot);
     }
   }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') render();
+    else updateWakeLock(session.getSnapshot());
+  });
+  window.addEventListener('pageshow', render);
 
   if (startButton) startButton.addEventListener('click', () => start(getRoutineExercises()));
   document.getElementById('btn-rep-plus')?.addEventListener('click', () => {
