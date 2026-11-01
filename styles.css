@@ -778,6 +778,97 @@ body.drawer-open {
   border-color: var(--accent) !important;
 }
 
+.workout-session {
+  margin: var(--space-lg) 0;
+  border-color: var(--border-strong);
+  background: linear-gradient(135deg, var(--surface-elevated), var(--surface));
+}
+
+.session-heading,
+.session-controls,
+.session-rep-stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.session-heading {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.session-title {
+  margin: var(--space-xs) 0 0;
+  font-size: var(--text-lg);
+}
+
+.session-progress-label,
+.session-message,
+.session-rep-target,
+.session-timer-label {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.session-progress-label {
+  text-align: right;
+}
+
+.session-message {
+  margin: var(--space-sm) 0;
+}
+
+.session-timer-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.session-timer {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.session-reps-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.session-reps {
+  min-width: 3ch;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.session-controls {
+  flex-wrap: wrap;
+  margin-top: var(--space-sm);
+}
+
+.session-controls .btn {
+  flex: 1 1 140px;
+}
+
+.session-controls .hidden {
+  display: none !important;
+}
+
+.session-controls .btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* Gaveta Lateral / Modal Leve com Detalhes e Vetor Anatômico ([UI-03]) */
 .drawer-backdrop {
   position: fixed;
@@ -1311,5 +1402,20 @@ body.drawer-open {
 
   .card-actions {
     grid-template-columns: 1fr;
+  }
+
+  .session-heading,
+  .session-reps-area {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .session-rep-stepper {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+
+  .session-controls .btn {
+    flex-basis: 100%;
   }
 }

@@ -12,6 +12,7 @@ const PRECACHE_ASSETS = [
   './index.html',
   './styles.css',
   './app.js',
+  './workout-session.js',
   './storage.js',
   './manifest.webmanifest',
   './exercises.json',

@@ -14,6 +14,7 @@ import {
   importUserData,
   clearUserData
 } from './storage.js';
+import { SESSION_STATES, WorkoutSession } from './workout-session.js';
 
 const HIGH_CONTRAST_KEY = 'fitzero_high_contrast';
 
@@ -398,7 +399,7 @@ function setupNavigationAndTheme() {
 /**
  * 5. Gaveta Lateral / Modal Leve de Detalhes do Exercício e Vetor Anatômico ([UI-03])
  */
-function setupExerciseDrawer(onCompleteExercise) {
+function setupExerciseDrawer(onStartExercise) {
   const backdrop = document.getElementById('exercise-drawer-backdrop');
   const drawerEl = backdrop ? backdrop.querySelector('.exercise-drawer') : null;
   const btnClose = document.getElementById('btn-close-drawer');
@@ -498,11 +499,191 @@ function setupExerciseDrawer(onCompleteExercise) {
       const exercise = state.exercises.find((item) => item.id === state.activeExerciseId);
       if (!exercise) return;
 
-      onCompleteExercise(exercise, btnComplete, 'Concluir Série e Salvar');
+      closeDrawer();
+      onStartExercise(exercise);
     });
   }
 
   return { openDrawer, closeDrawer };
+}
+
+function setupWorkoutSession(getRoutineExercises) {
+  const session = new WorkoutSession();
+  const stateEl = document.getElementById('session-state');
+  const titleEl = document.getElementById('workout-session-title');
+  const progressEl = document.getElementById('session-progress');
+  const messageEl = document.getElementById('session-message');
+  const timerArea = document.getElementById('session-timer-area');
+  const timerLabel = document.getElementById('session-timer-label');
+  const timerEl = document.getElementById('session-timer');
+  const repsArea = document.getElementById('session-reps-area');
+  const repsEl = document.getElementById('session-reps');
+  const repTargetEl = document.getElementById('session-rep-target');
+  const startButton = document.getElementById('btn-session-start');
+  const completeSetButton = document.getElementById('btn-session-set-complete');
+  const pauseButton = document.getElementById('btn-session-pause');
+  const resumeButton = document.getElementById('btn-session-resume');
+  const skipButton = document.getElementById('btn-session-skip');
+  const endButton = document.getElementById('btn-session-end');
+  let intervalId = null;
+  let startedAt = null;
+  let historySaved = false;
+
+  function show(button, visible) {
+    if (button) button.classList.toggle('hidden', !visible);
+  }
+
+  function start(exercises) {
+    if (!exercises.length) {
+      if (messageEl) messageEl.textContent = 'Nenhum exercício disponível com os filtros atuais.';
+      return;
+    }
+    const snapshot = session.getSnapshot();
+    if (
+      snapshot.state !== SESSION_STATES.IDLE &&
+      snapshot.state !== SESSION_STATES.FINISHED &&
+      !window.confirm('Substituir a sessão em andamento? O progresso atual não será salvo.')
+    ) {
+      return;
+    }
+    session.start(exercises);
+    startedAt = Date.now();
+    historySaved = false;
+    if (intervalId) window.clearInterval(intervalId);
+    intervalId = window.setInterval(render, 250);
+    render();
+  }
+
+  function startExercise(exercise) {
+    const routine = getRoutineExercises();
+    const selectedIndex = routine.findIndex((item) => item.id === exercise.id);
+    start(selectedIndex >= 0 ? routine.slice(selectedIndex) : [exercise]);
+  }
+
+  function saveCompletedSession(snapshot) {
+    if (historySaved) return;
+    historySaved = true;
+    if (!snapshot.completedExercises.length || !startedAt) return;
+
+    saveWorkoutRecord({
+      data_iso: new Date().toISOString(),
+      treino_id: 'sessao-fitzero',
+      duracao_min: Math.max(1, Math.ceil((Date.now() - startedAt) / 60000)),
+      exercicios_concluidos: snapshot.completedExercises
+    });
+  }
+
+  function render() {
+    const snapshot = session.tick();
+    const active = snapshot.state !== SESSION_STATES.IDLE && snapshot.state !== SESSION_STATES.FINISHED;
+    const exercise = snapshot.exercise;
+    const prescription = snapshot.prescription;
+    const phaseLabel = snapshot.paused ? `PAUSADO · ${snapshot.state}` : snapshot.state;
+
+    if (stateEl) stateEl.textContent = phaseLabel;
+    if (titleEl) {
+      titleEl.textContent = exercise
+        ? exercise.nome_popular
+        : snapshot.state === SESSION_STATES.FINISHED
+          ? 'Treino concluído'
+          : 'Sessão pronta';
+    }
+    if (progressEl) {
+      progressEl.textContent = exercise
+        ? `Exercício ${snapshot.exerciseIndex + 1} de ${snapshot.exerciseCount} · Série ${snapshot.setNumber} de ${snapshot.totalSets}`
+        : snapshot.state === SESSION_STATES.FINISHED
+          ? `${snapshot.completedExercises.length} exercício(s) concluído(s)`
+          : 'Aguardando início';
+    }
+
+    if (messageEl) {
+      if (snapshot.state === SESSION_STATES.IDLE) {
+        const total = getRoutineExercises().length;
+        messageEl.textContent = total
+          ? `Rotina atual: ${total} exercício(s) conforme ambiente e foco selecionados.`
+          : 'Nenhum exercício disponível com os filtros atuais.';
+      } else if (snapshot.state === SESSION_STATES.PREPARING) {
+        messageEl.textContent = 'Prepare a posição. A série começa em instantes.';
+      } else if (snapshot.state === SESSION_STATES.WORK && prescription.kind === 'time') {
+        messageEl.textContent = 'Mantenha a posição e respire de forma contínua.';
+      } else if (snapshot.state === SESSION_STATES.WORK) {
+        messageEl.textContent = `Conte as repetições. Alvo: ${prescription.minimum} a ${prescription.maximum}.`;
+      } else if (snapshot.state === SESSION_STATES.REST) {
+        messageEl.textContent = snapshot.exerciseComplete
+          ? 'Descanso antes do próximo exercício.'
+          : 'Descanse antes da próxima série.';
+      } else if (snapshot.state === SESSION_STATES.FINISHED) {
+        messageEl.textContent = snapshot.completedExercises.length
+          ? `${snapshot.completedExercises.length} exercício(s) concluído(s). Sessão registrada no histórico.`
+          : 'Sessão encerrada sem séries completas.';
+      }
+      if (snapshot.paused) messageEl.textContent = 'Sessão pausada. Retome quando estiver pronto.';
+    }
+
+    const showTimer = active && snapshot.remainingSeconds !== null;
+    show(timerArea, showTimer);
+    if (showTimer && timerEl) {
+      const minutes = Math.floor(snapshot.remainingSeconds / 60);
+      const seconds = snapshot.remainingSeconds % 60;
+      timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      if (timerLabel) {
+        timerLabel.textContent = snapshot.state === SESSION_STATES.PREPARING
+          ? 'Preparação'
+          : snapshot.state === SESSION_STATES.REST
+            ? 'Descanso'
+            : 'Tempo da série';
+      }
+    }
+
+    const showReps = active && snapshot.state === SESSION_STATES.WORK && prescription.kind === 'reps';
+    show(repsArea, showReps);
+    if (showReps) {
+      if (repsEl) repsEl.textContent = String(snapshot.repetitions);
+      if (repTargetEl) repTargetEl.textContent = `Mínimo ${prescription.minimum} · máximo ${prescription.maximum}`;
+    }
+    show(startButton, !active);
+    if (startButton) startButton.textContent = snapshot.state === SESSION_STATES.FINISHED ? 'Iniciar novamente' : 'Iniciar rotina';
+    show(completeSetButton, showReps);
+    if (completeSetButton) {
+      completeSetButton.disabled = !showReps || snapshot.repetitions < prescription.minimum;
+    }
+    show(pauseButton, active && !snapshot.paused);
+    show(resumeButton, active && snapshot.paused);
+    show(skipButton, active);
+    show(endButton, active);
+
+    if (snapshot.state === SESSION_STATES.FINISHED) {
+      if (intervalId) window.clearInterval(intervalId);
+      intervalId = null;
+      saveCompletedSession(snapshot);
+    }
+  }
+
+  if (startButton) startButton.addEventListener('click', () => start(getRoutineExercises()));
+  document.getElementById('btn-rep-plus')?.addEventListener('click', () => {
+    if (session.addRepetition()) render();
+  });
+  document.getElementById('btn-rep-minus')?.addEventListener('click', () => {
+    if (session.removeRepetition()) render();
+  });
+  completeSetButton?.addEventListener('click', () => {
+    if (session.completeSet()) render();
+  });
+  pauseButton?.addEventListener('click', () => {
+    if (session.pause()) render();
+  });
+  resumeButton?.addEventListener('click', () => {
+    if (session.resume()) render();
+  });
+  skipButton?.addEventListener('click', () => {
+    if (session.skipExercise()) render();
+  });
+  endButton?.addEventListener('click', () => {
+    if (session.end()) render();
+  });
+
+  render();
+  return { startExercise, refresh: render };
 }
 
 /**
@@ -514,26 +695,12 @@ async function loadExercisesCatalog() {
   const contextTextEl = document.getElementById('env-context-text');
   const envButtons = document.querySelectorAll('.env-btn');
   const focusChips = document.querySelectorAll('.focus-chip');
-
-  function completeExerciseAction(exercise, buttonEl, defaultLabel = 'Concluir Série') {
-    const result = saveWorkoutRecord({
-      data_iso: new Date().toISOString(),
-      treino_id: exercise.id || 'treino-calistenia',
-      duracao_min: Number(exercise.tempo_estimado_min) || 10,
-      exercicios_concluidos: [exercise.nome_popular || exercise.id]
-    });
-
-    if (result.success && buttonEl) {
-      buttonEl.classList.add('btn-done');
-      buttonEl.innerHTML = '<span>Série Registrada!</span>';
-      setTimeout(() => {
-        buttonEl.classList.remove('btn-done');
-        buttonEl.innerHTML = `<span>${escapeHtml(defaultLabel)}</span>`;
-      }, 1500);
-    }
-  }
-
-  const drawerController = setupExerciseDrawer(completeExerciseAction);
+  const getRoutineExercises = () =>
+    state.exercises
+      .filter((exercise) => exercise.ambiente === state.currentEnv)
+      .filter((exercise) => matchesMuscleFocus(exercise, state.currentFocus));
+  const sessionController = setupWorkoutSession(getRoutineExercises);
+  const drawerController = setupExerciseDrawer(sessionController.startExercise);
 
   try {
     const response = await fetch('./exercises.json');
@@ -573,6 +740,7 @@ async function loadExercisesCatalog() {
         <article class="card">
           <p class="card-meta" style="margin:0;">Nenhum exercício encontrado para este filtro. Selecione "Todos" para ver a rotina completa do ambiente.</p>
         </article>`;
+      sessionController.refresh();
       return;
     }
 
@@ -637,10 +805,7 @@ async function loadExercisesCatalog() {
             class="btn btn-primary btn-block btn-complete-workout"
             data-id="${escapeHtml(ex.id)}"
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M20 6L9 17l-5-5"/>
-            </svg>
-            <span>Concluir Série</span>
+            <span>Iniciar exercício</span>
           </button>
         </div>
       </article>`;
@@ -660,11 +825,10 @@ async function loadExercisesCatalog() {
       btn.addEventListener('click', () => {
         const exId = btn.getAttribute('data-id');
         const exercise = state.exercises.find((item) => item.id === exId);
-        if (exercise) {
-          completeExerciseAction(exercise, btn, 'Concluir Série');
-        }
+        if (exercise) sessionController.startExercise(exercise);
       });
     });
+    sessionController.refresh();
   }
 
   envButtons.forEach((btn) => {
