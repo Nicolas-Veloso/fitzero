@@ -532,9 +532,75 @@ function setupWorkoutSession(getRoutineExercises) {
   let wakeLockRequest = null;
   let wakeLockRequestId = 0;
   let wakeLockWanted = false;
+  let audioContext = null;
+  let previousSnapshot = null;
+  let lastRestCueSecond = null;
 
   function show(button, visible) {
     if (button) button.classList.toggle('hidden', !visible);
+  }
+
+  function getAudioContext() {
+    const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextConstructor) return null;
+
+    try {
+      if (!audioContext) audioContext = new AudioContextConstructor();
+      if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
+      return audioContext;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function playTone(frequency, durationSeconds) {
+    const context = getAudioContext();
+    if (!context) return;
+
+    try {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      const startTime = context.currentTime;
+      const endTime = startTime + durationSeconds;
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(frequency, startTime);
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.18, startTime + 0.015);
+      gain.gain.setValueAtTime(0.18, Math.max(startTime + 0.02, endTime - 0.03));
+      gain.gain.exponentialRampToValueAtTime(0.0001, endTime);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start(startTime);
+      oscillator.stop(endTime);
+    } catch (_) {}
+  }
+
+  function announceSessionCue(snapshot) {
+    if (
+      snapshot.state === SESSION_STATES.WORK &&
+      !snapshot.paused &&
+      previousSnapshot?.state !== SESSION_STATES.WORK
+    ) {
+      playTone(880, 0.7);
+      try {
+        navigator.vibrate?.([100, 50, 100]);
+      } catch (_) {}
+    }
+
+    if (snapshot.state === SESSION_STATES.REST) {
+      const seconds = snapshot.remainingSeconds;
+      if (!snapshot.paused && seconds >= 1 && seconds <= 3 && seconds !== lastRestCueSecond) {
+        playTone(660, 0.14);
+        lastRestCueSecond = seconds;
+      } else if (seconds > 3) {
+        lastRestCueSecond = null;
+      }
+    } else {
+      lastRestCueSecond = null;
+    }
+
+    previousSnapshot = snapshot;
   }
 
   function updateWakeLock(snapshot, forceRequest = false) {
@@ -605,6 +671,7 @@ function setupWorkoutSession(getRoutineExercises) {
     ) {
       return;
     }
+    getAudioContext();
     session.start(exercises);
     startedAt = Date.now();
     historySaved = false;
@@ -634,6 +701,7 @@ function setupWorkoutSession(getRoutineExercises) {
 
   function render() {
     const snapshot = session.tick();
+    announceSessionCue(snapshot);
     const active = snapshot.state !== SESSION_STATES.IDLE && snapshot.state !== SESSION_STATES.FINISHED;
     const exercise = snapshot.exercise;
     const prescription = snapshot.prescription;
