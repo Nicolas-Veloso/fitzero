@@ -722,6 +722,11 @@ body.drawer-open {
   height: 70px;
 }
 
+/* Miniaturas paradas: o movimento fica só na gaveta de detalhes */
+.card-thumb-btn svg * {
+  animation: none !important;
+}
+
 /* Faixa de Métricas do Exercício */
 .specs-grid {
   display: grid;
@@ -1031,12 +1036,12 @@ body.drawer-open {
 
 /* Microanimações CSS Leves para Vetores Anatômicos ([CONT-03]) */
 .svg-muscle-highlight {
-  animation: pulseMuscle 2.4s ease-in-out infinite;
+  animation: pulseMuscle 3s ease-in-out infinite;
 }
 
 .svg-force-arrow {
   stroke-dasharray: 5 4;
-  animation: forceFlow 1.8s linear infinite;
+  animation: forceFlow 3.2s linear infinite;
 }
 
 @keyframes pulseMuscle {
@@ -1051,6 +1056,42 @@ body.drawer-open {
 @keyframes forceFlow {
   to {
     stroke-dashoffset: -18;
+  }
+}
+
+/* Respiração e trava postural dos vetores ([CONT-03], Dev 4): só opacity/transform, leve em celular de entrada.
+   O movimento do boneco em si é SVG animado (SMIL) dentro de cada arquivo em assets/svg/. */
+.svg-breath {
+  opacity: 0.7;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: breathe 6s ease-in-out infinite;
+}
+
+.svg-posture-line {
+  opacity: 0.8;
+  animation: postureGuide 6s ease-in-out infinite;
+}
+
+/* Ciclo de 6 s igual ao do boneco (ver CICLO em tools/svg-poses.mjs):
+   anel grande = pulmão cheio (início); encolhe durante o esforço (solta o ar) e volta a encher na volta */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1.2);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(0.85);
+    opacity: 0.4;
+  }
+}
+
+@keyframes postureGuide {
+  0%, 100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
   }
 }
 
@@ -1072,6 +1113,8 @@ body.drawer-open {
 @media (prefers-reduced-motion: reduce) {
   .svg-muscle-highlight,
   .svg-force-arrow,
+  .svg-breath,
+  .svg-posture-line,
   .drawer-backdrop,
   .exercise-drawer {
     animation: none !important;

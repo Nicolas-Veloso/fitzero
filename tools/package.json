@@ -1,0 +1,14 @@
+{
+  "name": "fitzero-tools",
+  "private": true,
+  "type": "module",
+  "description": "Ferramentas de conteúdo do FitZero (Dev 4): geração e otimização dos SVGs e validação do catálogo. Não faz parte do bundle do app.",
+  "scripts": {
+    "build:svg": "node build-svg.mjs",
+    "validate": "node validate-content.mjs",
+    "build:fonte": "node build-editable.mjs"
+  },
+  "devDependencies": {
+    "svgo": "3.3.2"
+  }
+}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" width="960" height="560" viewBox="0 0 240 140">
+  <sodipodi:namedview id="base" pagecolor="#111114" inkscape:pageopacity="1" inkscape:zoom="1" inkscape:current-layer="vetor-corpo"/>
+  <g id="fundo" inkscape:groupmode="layer" inkscape:label="fundo" sodipodi:insensitive="true">
+    <rect width="240" height="140" fill="#111114"/>
+  </g>
+  <g id="estrutura-ambiente" inkscape:groupmode="layer" inkscape:label="estrutura-ambiente">
+    <path id="path0" stroke="#383840" stroke-width="2" d="M20 118 L220 118" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect id="rect1" x="36" y="76" width="76" height="6" rx="2" stroke="#383840" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path id="path2" stroke="#383840" stroke-width="2.5" d="M44 82 L44 118" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path id="path3" stroke="#383840" stroke-width="2.5" d="M104 82 L104 118" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="vetor-corpo" inkscape:groupmode="layer" inkscape:label="vetor-corpo">
+    <path id="path4" stroke="#f5f5f7" stroke-width="3" d="M110 56 L91.4 59.8 L104 74" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path id="path5" stroke="#f5f5f7" stroke-width="3" d="M124 92 L148.6 78.5 L154 106 L166 114" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle id="circle9" cx="112" cy="43" r="9" stroke="#f5f5f7" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="musculo-ativo" inkscape:groupmode="layer" inkscape:label="musculo-ativo">
+    <path id="path6" stroke="#d4ff00" stroke-width="7" d="M110 56 L91.4 59.8 L104 74" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path id="path7" stroke="#d4ff00" stroke-opacity="0.4" stroke-width="12" d="M106.6 56.7 L94.8 59.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="alinhamento-coluna" inkscape:groupmode="layer" inkscape:label="alinhamento-coluna">
+    <path id="path8" stroke="#00e5b0" stroke-width="4" d="M110 56 L124 92" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="pontos-apoio" inkscape:groupmode="layer" inkscape:label="pontos-apoio">
+    <circle id="circle10" cx="104" cy="73" r="5" fill="#ffd60a" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle id="circle11" cx="162" cy="113" r="5" fill="#ffd60a" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="seta-forca" inkscape:groupmode="layer" inkscape:label="seta-forca">
+    <path id="path13" stroke="#d4ff00" stroke-width="2" stroke-dasharray="5 4" d="M186 104 L186 75" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path id="path14" d="M190.5 75L186 68L181.5 75" stroke="#d4ff00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g id="anel-respiracao" inkscape:groupmode="layer" inkscape:label="anel-respiracao">
+    <ellipse id="ellipse12" cx="115.6" cy="70.4" rx="8" ry="9" stroke="#00e5b0" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

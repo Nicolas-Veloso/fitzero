@@ -16,7 +16,7 @@
     "ambiente": "casa",
     "nivel": "Iniciante",
     "tempo_estimado_min": 12,
-    "foco_muscular": "Coxas, Glúteos e Core",
+    "foco_muscular": "Coxas, Glúteos e Abdômen",
     "series_recomendadas": "3 séries de 10 a 15 repetições",
     "regressao_segura": "Use uma cadeira ou banco atrás de você: sente encostando de leve e levante empurrando o chão com o calcanhar.",
     "pontos_atencao": "Alinhe os joelhos na direção da ponta dos pés e mantenha o peito aberto olhando para a frente."
@@ -33,6 +33,50 @@
     "pontos_atencao": "Empurre o chão com os antebraços para afastar os ombros das orelhas e respire de forma contínua sem prender o ar."
   },
   {
+    "id": "ponte-gluteos",
+    "nome_popular": "Ponte de Glúteos (Quadril pra Cima)",
+    "ambiente": "casa",
+    "nivel": "Iniciante",
+    "tempo_estimado_min": 10,
+    "foco_muscular": "Glúteos, Coxas e Lombar",
+    "series_recomendadas": "3 séries de 12 a 15 repetições",
+    "regressao_segura": "Suba só até onde for confortável e desça devagar. Deixe os braços esticados no chão ao lado do corpo para se firmar.",
+    "pontos_atencao": "Empurre o chão com os calcanhares até formar uma linha reta dos ombros até os joelhos, sem arquear a lombar. Aperte o bumbum lá em cima e solte o ar na subida."
+  },
+  {
+    "id": "quadrupede-cruzado",
+    "nome_popular": "Braço e Perna Opostos no Chão",
+    "ambiente": "casa",
+    "nivel": "Iniciante",
+    "tempo_estimado_min": 8,
+    "foco_muscular": "Abdômen, Lombar e Equilíbrio",
+    "series_recomendadas": "3 séries de 8 repetições para cada lado",
+    "regressao_segura": "Estique só a perna ou só o braço de cada vez, mantendo o resto bem firme. Coloque um pano dobrado embaixo dos joelhos para não machucar.",
+    "pontos_atencao": "Mantenha as costas retas como uma mesa, sem deixar a barriga cair. Estique braço e perna sem girar o quadril e olhe para o chão para o pescoço ficar alinhado."
+  },
+  {
+    "id": "prancha-lateral",
+    "nome_popular": "Prancha de Lado",
+    "ambiente": "casa",
+    "nivel": "Iniciante / Adaptado",
+    "tempo_estimado_min": 8,
+    "foco_muscular": "Laterais da Barriga, Ombros e Lombar",
+    "series_recomendadas": "3 séries de 15 a 20 segundos de cada lado",
+    "regressao_segura": "Dobre os joelhos e deixe os dois apoiados no chão. Só o quadril sai do chão, com o corpo reto dos joelhos até a cabeça.",
+    "pontos_atencao": "Cotovelo logo abaixo do ombro e quadril alto, formando uma linha reta da cabeça aos pés. Empurre o chão com o antebraço e respire normalmente, sem prender o ar."
+  },
+  {
+    "id": "elevacao-panturrilha",
+    "nome_popular": "Ponta de Pé com Apoio na Parede",
+    "ambiente": "casa",
+    "nivel": "Iniciante",
+    "tempo_estimado_min": 8,
+    "foco_muscular": "Panturrilhas, Tornozelos e Pernas",
+    "series_recomendadas": "3 séries de 12 a 20 repetições",
+    "regressao_segura": "Apoie as duas mãos na parede e suba só um pouquinho. Quando ficar fácil, use um degrau para descer mais fundo.",
+    "pontos_atencao": "Suba devagar na ponta dos pés, sem deixar os tornozelos tombarem para dentro ou para fora. Desça contando 3 segundos, com o corpo reto e os joelhos soltos."
+  },
+  {
     "id": "remada-australiana-praca",
     "nome_popular": "Remada Inclinada na Barra Baixa",
     "ambiente": "praca",
@@ -47,7 +91,7 @@
     "id": "barra-fixa-escapular",
     "nome_popular": "Suspensão Ativa na Barra",
     "ambiente": "praca",
-    "nivel": "Iniciante / Engressante",
+    "nivel": "Iniciante",
     "tempo_estimado_min": 10,
     "foco_muscular": "Ombros, Antebraço e Postura",
     "series_recomendadas": "3 séries de 15 a 25 segundos",
@@ -64,5 +108,49 @@
     "series_recomendadas": "3 séries de 8 repetições por perna",
     "regressao_segura": "Segure no encosto do banco ou na estrutura da barra para garantir equilíbrio total durante a descida.",
     "pontos_atencao": "Desça com o tronco reto em direção ao chão, mantendo o calcanhar do pé da frente totalmente apoiado."
+  },
+  {
+    "id": "flexao-inclinada-banco",
+    "nome_popular": "Flexão com as Mãos no Banco",
+    "ambiente": "praca",
+    "nivel": "Iniciante",
+    "tempo_estimado_min": 12,
+    "foco_muscular": "Peito, Ombros e Tríceps",
+    "series_recomendadas": "3 séries de 8 a 12 repetições",
+    "regressao_segura": "Quanto mais alto for o apoio (encosto do banco ou uma barra), mais leve fica. Vá baixando a altura aos poucos, conforme ganhar força.",
+    "pontos_atencao": "Mãos na largura dos ombros, firmes e sem dobrar o punho. Cotovelos para trás (a 45° do corpo), abdômen firme e quadril alinhado, sem deixar a barriga cair."
+  },
+  {
+    "id": "subida-no-banco",
+    "nome_popular": "Subida no Banco (Degrau da Praça)",
+    "ambiente": "praca",
+    "nivel": "Iniciante",
+    "tempo_estimado_min": 12,
+    "foco_muscular": "Coxas, Glúteos e Equilíbrio",
+    "series_recomendadas": "3 séries de 8 repetições por perna",
+    "regressao_segura": "Escolha um degrau baixo e segure no poste ou na barra para se firmar. Suba e desça sem pressa.",
+    "pontos_atencao": "Apoie o pé inteiro no banco e suba empurrando com a perna da frente, sem tomar impulso com a de trás. Joelho na direção da ponta do pé, tronco reto e descida lenta."
+  },
+  {
+    "id": "triceps-banco",
+    "nome_popular": "Tríceps no Banco (Pés no Chão)",
+    "ambiente": "praca",
+    "nivel": "Iniciante / Adaptado",
+    "tempo_estimado_min": 10,
+    "foco_muscular": "Tríceps, Ombros e Peito",
+    "series_recomendadas": "3 séries de 6 a 10 repetições",
+    "regressao_segura": "Deixe os joelhos bem dobrados e os pés perto do banco. Desça só um pouco, até onde o ombro não incomodar.",
+    "pontos_atencao": "Costas coladas no banco e ombros longe das orelhas. Desça só até os cotovelos formarem um ângulo de 90° e empurre o banco para subir. Se doer o ombro, pare e troque de exercício."
+  },
+  {
+    "id": "joelho-ao-peito-barra",
+    "nome_popular": "Elevação de Joelhos na Barra",
+    "ambiente": "praca",
+    "nivel": "Iniciante / Adaptado",
+    "tempo_estimado_min": 10,
+    "foco_muscular": "Abdômen, Ombros e Pegada",
+    "series_recomendadas": "3 séries de 6 a 10 repetições",
+    "regressao_segura": "Faça com a ponta dos pés tocando o chão ou um degrau e leve um joelho de cada vez em direção ao peito.",
+    "pontos_atencao": "Antes de subir os joelhos, puxe os ombros para baixo (longe das orelhas). Suba com controle, sem balançar o corpo, e desça devagar sem soltar de uma vez."
   }
 ]
