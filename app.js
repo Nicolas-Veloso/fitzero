@@ -157,6 +157,58 @@ function getExerciseAnatomySvg(exerciseId) {
 }
 
 /**
+ * Carrega a ilustração do exercício a partir de assets/svg/<id>.svg ([CONT-02], Dev 4).
+ * Os arquivos são pré-cacheados pelo Service Worker, então funcionam offline.
+ * O SVG é injetado inline para herdar as variáveis CSS do tema e as animações.
+ * Se o arquivo não existir (ou o SW devolver o placeholder offline), cai no desenho genérico.
+ */
+const svgCache = new Map();
+
+/**
+ * O boneco se move com animação SVG nativa (SMIL), que ignora o CSS.
+ * Quem pede "reduzir movimento" no aparelho vê o desenho parado na posição inicial.
+ */
+function applyMotionPreference(container) {
+  const svg = container.querySelector('svg');
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (svg && reduce && typeof svg.pauseAnimations === 'function') svg.pauseAnimations();
+}
+
+async function loadExerciseSvg(exerciseId) {
+  if (svgCache.has(exerciseId)) return svgCache.get(exerciseId);
+  try {
+    const response = await fetch(`./assets/svg/${encodeURIComponent(exerciseId)}.svg`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const markup = (await response.text()).trim();
+    // Placeholder do SW (viewBox 100x100) e qualquer outra coisa que não seja nosso SVG são descartados
+    if (!markup.startsWith('<svg') || !markup.includes('viewBox="0 0 240 140"')) {
+      throw new Error('SVG inesperado');
+    }
+    svgCache.set(exerciseId, markup);
+    return markup;
+  } catch (err) {
+    console.warn(`[CONT-02] Usando SVG de reserva para "${exerciseId}":`, err.message);
+    return getExerciseAnatomySvg(exerciseId);
+  }
+}
+
+/**
+ * Preenche as miniaturas dos cards com o SVG de cada exercício ([CONT-02], Dev 4).
+ * Nas miniaturas o boneco fica parado na posição inicial (economiza CPU em celular de entrada);
+ * o movimento aparece só na gaveta "Postura & Vetor".
+ */
+function hydrateCardThumbnails(root) {
+  root.querySelectorAll('.card-thumb-btn[data-id]').forEach((btn) => {
+    loadExerciseSvg(btn.getAttribute('data-id')).then((markup) => {
+      if (!btn.isConnected) return;
+      btn.innerHTML = markup;
+      const svg = btn.querySelector('svg');
+      if (svg && typeof svg.pauseAnimations === 'function') svg.pauseAnimations();
+    });
+  });
+}
+
+/**
  * Classifica o grupo muscular do exercício para o filtro rápido de chips ([UI-03])
  */
 function matchesMuscleFocus(exercise, focusFilter) {
@@ -435,7 +487,13 @@ function setupExerciseDrawer(onStartExercise) {
       titleEl.textContent = exercise.nome_popular;
     }
     if (svgContainer) {
-      svgContainer.innerHTML = getExerciseAnatomySvg(exercise.id);
+      svgContainer.innerHTML = svgCache.get(exercise.id) || '';
+      applyMotionPreference(svgContainer);
+      loadExerciseSvg(exercise.id).then((markup) => {
+        if (state.activeExerciseId !== exercise.id) return;
+        svgContainer.innerHTML = markup;
+        applyMotionPreference(svgContainer);
+      });
       svgContainer.setAttribute(
         'aria-label',
         `Ilustração anatômica de ${exercise.nome_popular}: foco em ${exercise.foco_muscular}`
@@ -906,7 +964,7 @@ async function loadExercisesCatalog() {
             aria-label="Ver ilustração anatômica e detalhes de ${escapeHtml(ex.nome_popular)}"
             title="Ver vetor anatômico"
           >
-            ${getExerciseAnatomySvg(ex.id)}
+            ${svgCache.get(ex.id) || ''}
           </button>
 
           <div class="specs-grid">
@@ -945,6 +1003,8 @@ async function loadExercisesCatalog() {
       </article>`;
       })
       .join('');
+
+    hydrateCardThumbnails(listEl);
 
     listEl.querySelectorAll('.btn-open-drawer').forEach((btn) => {
       btn.addEventListener('click', () => {

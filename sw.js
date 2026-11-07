@@ -5,7 +5,7 @@
  * Estratégia: Cache-First estrita com pré-cache de App Shell + Fallback Offline
  */
 
-const CACHE_NAME = 'fitzero-v1';
+const CACHE_NAME = 'fitzero-v3';
 
 const PRECACHE_ASSETS = [
   './',
@@ -19,7 +19,21 @@ const PRECACHE_ASSETS = [
   './assets/icons/icon.svg',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
-  './assets/icons/apple-touch-icon.png'
+  './assets/icons/apple-touch-icon.png',
+  './assets/svg/flexao-parede-solo.svg',
+  './assets/svg/agachamento-livre.svg',
+  './assets/svg/prancha-isometrica.svg',
+  './assets/svg/ponte-gluteos.svg',
+  './assets/svg/quadrupede-cruzado.svg',
+  './assets/svg/prancha-lateral.svg',
+  './assets/svg/elevacao-panturrilha.svg',
+  './assets/svg/remada-australiana-praca.svg',
+  './assets/svg/barra-fixa-escapular.svg',
+  './assets/svg/afundo-estatico-banco.svg',
+  './assets/svg/flexao-inclinada-banco.svg',
+  './assets/svg/subida-no-banco.svg',
+  './assets/svg/triceps-banco.svg',
+  './assets/svg/joelho-ao-peito-barra.svg'
 ];
 
 /**
